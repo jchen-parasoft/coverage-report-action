@@ -1,0 +1,18 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Run Unit Tests with Coverage Report'){
+            steps {
+                bat 'generate_coverage.bat'
+            }
+        }
+    }
+
+    post {
+        always {
+            recordParasoftCoverage pattern: '**/coverage.xml'
+        }
+    }
+
+}
