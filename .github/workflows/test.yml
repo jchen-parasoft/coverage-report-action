@@ -24,7 +24,7 @@ jobs:
           workingDir: 'soatest'
           data: './'
           resource: 'TestAssets'
-          settings: 'soatest/localsettings.properties'
+          settings: 'localsettings.properties'
           report: 'reports'
           reportFormat: 'xml,html'
           convertReportToXUnit: true
