@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<TestsRun>
+   <Project err="0" fail="0" name="ProvisioningAssets" skip="0" success="0" total="0"/>
+   <Project err="0" fail="23" name="TestAssets" skip="0" success="0" total="23">
+      <TestCase fail="true" id="wk:///TestAssets/RuleExamples.tst#0000000000#0000000032#0000000022"/>
+      <TestCase fail="true" id="wk:///TestAssets/RuleExamples.tst#0000000000#0000000032#0000000021"/>
+      <TestCase fail="true" id="wk:///TestAssets/RuleExamples.tst#0000000000#0000000026#0000000006"/>
+      <TestCase fail="true" id="wk:///TestAssets/RuleExamples.tst#0000000000#0000000032#0000000020"/>
+      <TestCase fail="true" id="wk:///TestAssets/RuleExamples.tst#0000000000#0000000031#0000000019"/>
+      <TestCase fail="true" id="wk:///TestAssets/RuleExamples.tst#0000000000#0000000026#0000000004"/>
+      <TestCase fail="true" id="wk:///TestAssets/RuleExamples.tst#0000000000#0000000028#0000000012"/>
+      <TestCase fail="true" id="wk:///TestAssets/RuleExamples.tst#0000000000#0000000030#0000000017"/>
+      <TestCase fail="true" id="wk:///TestAssets/RuleExamples.tst#0000000000#0000000026#0000000005"/>
+      <TestCase fail="true" id="wk:///TestAssets/RuleExamples.tst#0000000000#0000000028#0000000011"/>
+      <TestCase fail="true" id="wk:///TestAssets/RuleExamples.tst#0000000000#0000000030#0000000016"/>
+      <TestCase fail="true" id="wk:///TestAssets/RuleExamples.tst#0000000000#0000000030#0000000015"/>
+      <TestCase fail="true" id="wk:///TestAssets/RuleExamples.tst#0000000000#0000000026#0000000003"/>
+      <TestCase fail="true" id="wk:///TestAssets/RuleExamples.tst#0000000000#0000000032#0000000023"/>
+      <TestCase fail="true" id="wk:///TestAssets/RuleExamples.tst#0000000000#0000000033#0000000024"/>
+      <TestCase fail="true" id="wk:///TestAssets/RuleExamples.tst#0000000000#0000000033#0000000025"/>
+      <TestCase fail="true" id="wk:///TestAssets/RuleExamples.tst#0000000000#0000000027#0000000007"/>
+      <TestCase fail="true" id="wk:///TestAssets/RuleExamples.tst#0000000000#0000000027#0000000008"/>
+      <TestCase fail="true" id="wk:///TestAssets/RuleExamples.tst#0000000000#0000000027#0000000009"/>
+      <TestCase fail="true" id="wk:///TestAssets/RuleExamples.tst#0000000000#0000000031#0000000018"/>
+      <TestCase fail="true" id="wk:///TestAssets/RuleExamples.tst#0000000000#0000000027#0000000010"/>
+      <TestCase fail="true" id="wk:///TestAssets/RuleExamples.tst#0000000000#0000000029#0000000014"/>
+      <TestCase fail="true" id="wk:///TestAssets/RuleExamples.tst#0000000000#0000000029#0000000013"/>
+   </Project>
+   <Project err="0" fail="0" name="VirtualAssets" skip="0" success="0" total="0"/>
+</TestsRun>
