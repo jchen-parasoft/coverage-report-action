@@ -21,7 +21,7 @@ jobs:
       - name: Run local action
         uses: parasoft/run-soatest-action@jason_cicd805
         with:
-          data: 'soatest'
+          data: 'D:\tool\actions-runner\ExampleAction\_work\ExampleAction\ExampleAction\soatest'
           resource: 'TestAssets'
           settings: 'soatest/localsettings.properties'
           report: 'reports'
