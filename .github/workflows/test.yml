@@ -27,4 +27,3 @@ jobs:
           report: 'reports'
           reportFormat: 'xml,html'
           convertReportToXUnit: true
-          javaRootPath: 'C:\Program Files\Java\jdk-11.0.6'
