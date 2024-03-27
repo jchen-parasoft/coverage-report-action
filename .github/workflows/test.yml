@@ -21,6 +21,7 @@ jobs:
       - name: Run local action
         uses: parasoft/run-soatest-action@jason_cicd805
         with:
+          installDir: 'D:\Software\SOAtest & Virtualize\2023.1'
           soatestWorkspace: 'soatest'
           resource: 'TestAssets'
           settings: 'soatest/localsettings.properties'
