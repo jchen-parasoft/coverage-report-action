@@ -1,10 +1,10 @@
-# Run Parasoft SOAtest action
+# Run Parasoft SOAtest
 
 [![Build](https://github.com/parasoft/run-soatest-action/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/parasoft/run-soatest-action/actions/workflows/build.yml)
 
-This action enables you to run functional tests with Parasoft SOAtest and review results on GitHub.
+This action enables you to run static analysis and execute tests with Parasoft SOAtest and review results on GitHub.
 
-Parasoft SOAtest is an enterprise-grade solution that simplifies complex testing for business-critical transactions through APIs, message brokers, databases mainframes, ERPs, browser-based UIs, and other endpoints.
+Parasoft SOAtest is an enterprise-grade solution that simplifies complex testing for business-critical transactions through APIs, message brokers, databases mainframes, ERPs, browser-based UIs, and other endpoints. SOAtest helps QA teams ensure secure, reliable, compliant business applications with an intuitive interface to create, maintain, and execute end-to-end testing scenarios.
 - Request [a free trial](https://www.parasoft.com/products/parasoft-soatest/soatest-request-a-demo/) to receive access to Parasoft SOAtest's features and capabilities.
 - See the [user guide](https://docs.parasoft.com/display/SOA20232) for information about Parasoft SOAtest's capabilities and usage.
 
@@ -22,7 +22,7 @@ This action requires Parasoft SOAtest with a valid Parasoft license.
 
 We recommend that you run Parasoft SOAtest on a self-hosted rather than GitHub-hosted runner.
 
-### Adding the SOAtest Action to a GitHub Workflow
+### Adding the Run SOAtest Action to a GitHub Workflow
 Add the `Run SOAtest` action to your workflow to launch test suites with Parasoft SOAtest.
 
 At a minimum, the action requires the `soatestWorkspace` parameter to be configured to specify the path to a SOAtest workspace that determines the scope of analysis.
@@ -60,6 +60,9 @@ jobs:
     permissions:
       # required for all workflows
       security-events: write
+      # only required for workflows in private repositories
+      actions: read
+      contents: read
 
     # Specifies the type of runner that the job will run on.
     runs-on: self-hosted
@@ -71,7 +74,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    # Runs test suites with SOAtest.
+    # Execute the tests with SOAtest.
     - name: Run SOAtest
       id: SOAtest
       uses: parasoft/run-soatest-action@1.0.0
@@ -79,14 +82,15 @@ jobs:
         #Specify a SOAtest workspace that determines the scope of analysis.
         soatestWorkspace: soatest
 
-    # Uploads the xunit report.
-    - name: Upload report
+    # Uploads the results in the XML format by using Publish Test Results action, so that they can be published on GitHub at various places.
+    - name: Upload results
       uses: EnricoMi/publish-unit-test-result-action@v2
       with:
+        #Specify the path to the report.
         files: reports/report-xunit.xml
 ```
 
-## Configuring Analysis with Jtest
+## Configuring Analysis with SOAtest
 You can configure analysis with Parasoft SOAtest in the following ways:
 - By customizing the `Run SOAtest` action directly in your GitHub workflow. See [Action Parameters](#action-parameters) for a complete list of available parameters.
 - By configuring options directly in Parasoft SOAtest tool. We recommend creating a soatestcli.properties file that includes all the configuration options and adding the file to SOAtest's working directory - typically, the root directory of your repository. This allows SOAtest to automatically read all the configuration options from that file. See [Parasoft SOAtest User Guide](https://docs.parasoft.com/display/SOA20232/Configuring+Settings) for details.
@@ -125,12 +129,22 @@ To specify a test configuration directly in your workflow, add the `testConfig` 
 ```
 
 #### Generating Reports
-Generating reports in the specific formats that is available in SOAtest:
+Generating reports in the specific formats that is available in SOAtest in a specific path:
 ```yaml
 - name: Run SOAtest
   uses: parasoft/run-soatest-action@1.0.0
   with:
-    reportFormat: pdf,html,custom
+    report: 'soatest/reports'
+    reportFormat: 'pdf,html,custom'
+```
+
+#### Import the configuration options
+To specify a customize configuration file including SOAtest configuration options:
+```yaml
+- name: Run SOAtest
+  uses: parasoft/run-soatest-action@1.0.0
+  with:
+  settings: 'localsettings.properties'
 ```
 
 ## Action Parameters
