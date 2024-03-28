@@ -1,5 +1,7 @@
 # Run Parasoft SOAtest action
 
+[![Build](https://github.com/parasoft/run-soatest-action/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/parasoft/run-soatest-action/actions/workflows/build.yml)
+
 This action enables you to run functional tests with Parasoft SOAtest and review results on GitHub.
 
 Parasoft SOAtest is an enterprise-grade solution that simplifies complex testing for business-critical transactions through APIs, message brokers, databases mainframes, ERPs, browser-based UIs, and other endpoints.
