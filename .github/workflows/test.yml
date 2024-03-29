@@ -13,6 +13,12 @@ on:
 jobs:
   build:
     name: Test Action
+    permissions:
+        checks: write
+        pull-requests: write
+        # only required for workflows in private repositories
+        contents: read
+        issues: read
     runs-on: self-hosted
     steps:
       - name: Checkout repository
