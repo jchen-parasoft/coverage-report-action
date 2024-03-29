@@ -30,7 +30,8 @@ jobs:
           soatestWorkspace: 'soatest'
 
       - name: Upload results
-        uses: EnricoMi/publish-unit-test-result-action/windows/bash@v2
+        uses: EnricoMi/publish-unit-test-result-action/windows@v2
+        if: always()
         with:
           files: |
             reports\report-xunit.xml
