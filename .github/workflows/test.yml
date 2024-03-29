@@ -29,11 +29,6 @@ jobs:
         with:
           soatestWorkspace: 'soatest'
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.12.2
-
       - name: Upload results
         uses: EnricoMi/publish-unit-test-result-action/windows@v2
         with:
