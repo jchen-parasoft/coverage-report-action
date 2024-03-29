@@ -13,12 +13,6 @@ on:
 jobs:
   build:
     name: Test Action
-    permissions:
-        checks: write
-        pull-requests: write
-        # only required for workflows in private repositories
-        contents: read
-        issues: read
     runs-on: self-hosted
     steps:
       - name: Checkout repository
@@ -29,11 +23,21 @@ jobs:
         with:
           soatestWorkspace: 'soatest'
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12' 
+      - name: Upload report artifact
+        uses: actions/upload-artifact@v2.2.3
+        with:       
+          path: reports
 
+  publish:
+    name: Publish Reports
+    permissions:
+        checks: write
+        pull-requests: write
+        # only required for workflows in private repositories
+        contents: read
+        issues: read
+    runs-on: windows-latest
+    steps:
       - name: Upload results
         uses: EnricoMi/publish-unit-test-result-action/windows@v2
         if: always()
