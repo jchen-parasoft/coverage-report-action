@@ -26,5 +26,5 @@ jobs:
       - name: Upload results
         uses: EnricoMi/publish-unit-test-result-action/windows@v2
         with:
-          #Specify the path to the report.
-          files: reports/report-xunit.xml
+          files: |
+            reports\report-xunit.xml
