@@ -30,6 +30,7 @@ jobs:
 
   publish:
     name: Publish Reports
+    needs: [build]
     permissions:
         checks: write
         pull-requests: write
