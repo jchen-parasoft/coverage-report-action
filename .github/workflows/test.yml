@@ -38,6 +38,13 @@ jobs:
         issues: read
     runs-on: windows-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Download Artifacts  # The built project is downloaded into the 'site' folder.
+        uses: actions/download-artifact@v1
+        with:
+          name: reports
       - name: Upload results
         uses: EnricoMi/publish-unit-test-result-action/windows@v2
         if: always()
