@@ -25,7 +25,8 @@ jobs:
 
       - name: Upload report artifact
         uses: actions/upload-artifact@v2.2.3
-        with:       
+        with:
+          name: reports
           path: reports
 
   publish:
