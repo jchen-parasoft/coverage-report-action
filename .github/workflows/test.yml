@@ -16,7 +16,7 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Run local action
         uses: parasoft/run-soatest-action@master
@@ -24,7 +24,7 @@ jobs:
           soatestWorkspace: 'soatest'
 
       - name: Upload report artifact
-        uses: actions/upload-artifact@v2.2.3
+        uses: actions/upload-artifact@v4
         with:
           name: reports
           path: reports
@@ -41,7 +41,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Download Artifacts  # The built project is downloaded into the 'site' folder.
         uses: actions/download-artifact@v1
