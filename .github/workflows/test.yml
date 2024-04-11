@@ -47,6 +47,11 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: reports
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
       - name: Upload results
         uses: EnricoMi/publish-unit-test-result-action/windows@v2
         if: always()
