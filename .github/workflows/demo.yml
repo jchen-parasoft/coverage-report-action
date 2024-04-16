@@ -53,4 +53,4 @@ jobs:
         if: always()
         with:
           files: |
-            reports\report-xunit.xml
+            report-xunit.xml
