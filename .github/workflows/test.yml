@@ -29,6 +29,11 @@ jobs:
           name: reports
           path: reports
 
+      - name: Download Artifacts  # The built project is downloaded into the 'site' folder.
+        uses: actions/download-artifact@v4
+        with:
+          name: reports
+
   publish:
     name: Publish Reports
     needs: [build]
@@ -57,4 +62,4 @@ jobs:
         if: always()
         with:
           files: |
-            reports\report-xunit.xml
+            report-xunit.xml
