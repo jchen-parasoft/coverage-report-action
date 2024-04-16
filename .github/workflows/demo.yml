@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    name: Test Action
+    name: Execute tests
     runs-on: self-hosted
     steps:
       - name: Checkout repository

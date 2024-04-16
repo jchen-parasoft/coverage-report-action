@@ -1,9 +1,0 @@
-Configuring data repository users
-2024-03-15T10:43:12.779+0800 W NETWORK  [thread1] Failed to connect to 127.0.0.1:9101, in(checking socket for error after poll), reason: No connection could be made because the target machine actively refused it.
-Waiting for data repository to start.
-Setting user.
-2024-03-15T10:43:15.783+0800 E QUERY    [thread1] Error: couldn't add user: not authorized on admin to execute command { createUser: "parasoft_embedded_repo", pwd: "xxx", roles: [ { role: "root", db: "admin" } ], digestPassword: false, writeConcern: { w: "majority", wtimeout: 600000.0 }, $db: "admin" } :
-_getErrorWithCode@src/mongo/shell/utils.js:25:13
-DB.prototype.createUser@src/mongo/shell/db.js:1437:15
-@D:\Workspace\Parasoft\soavirt_workspace\2023.1\.metadata\EmbeddedDataRepository\logs\config.js:34:1
-failed to load: D:\Workspace\Parasoft\soavirt_workspace\2023.1\.metadata\EmbeddedDataRepository\logs\config.js
