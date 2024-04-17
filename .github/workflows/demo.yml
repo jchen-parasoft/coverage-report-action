@@ -6,13 +6,13 @@ on:
 
 jobs:
   build:
-    name: Execute tests
+    name: Execute Tests
     runs-on: self-hosted
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Run local action
+      - name: Run SOAtest action
         uses: parasoft/run-soatest-action@1.0.0
         with:
           soatestWorkspace: 'soatest'
@@ -22,8 +22,8 @@ jobs:
       - name: Upload report artifact
         uses: actions/upload-artifact@v4
         with:
-          name: reports
-          path: reports
+          name: report
+          path: reports\report-xunit.xml
 
   publish:
     name: Publish Reports
@@ -42,7 +42,7 @@ jobs:
       - name: Download Artifacts
         uses: actions/download-artifact@v4
         with:
-          name: reports
+          name: report
 
       - uses: actions/setup-python@v5
         with:
