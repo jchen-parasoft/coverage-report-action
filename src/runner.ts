@@ -35,7 +35,7 @@ export class TestsRunner {
 
             await client.rest.checks.create({
                 name: checkName,
-                head_sha: github.context.payload.workflow_run.head_commit.id,
+                head_sha: github.context.sha,
                 status: "completed",
                 conclusion: "success",
                 output: {
