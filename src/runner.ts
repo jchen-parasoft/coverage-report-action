@@ -5,7 +5,7 @@ import * as github from '@actions/github';
 
 export interface RunOptions {
     reportPath: string;
-    repo_token: string;
+    repoToken: string;
 }
 
 interface ReportItem {
@@ -29,10 +29,15 @@ export class TestsRunner {
             const filePath = 'report-table.md';
             fs.writeFileSync(filePath, markdownTable, 'utf8');
 
+            const pullRequest = github.context.payload.pull_request;
+            const link = (pullRequest && pullRequest.html_url) || github.context.ref;
+            const headSha = (pullRequest && pullRequest.head.sha) || github.context.sha;
+            core.info(
+                `Posting status 'completed' with conclusion 'success' to ${link} (sha: ${headSha})`
+            );
+
             const checkName = "coverage";
-
-            const client = github.getOctokit(runOptions.repo_token);
-
+            const client = github.getOctokit(runOptions.repoToken);
             await client.rest.checks.create({
                 name: checkName,
                 head_sha: github.context.sha,

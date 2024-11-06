@@ -22,8 +22,12 @@ class TestsRunner {
             core.info(markdownTable);
             const filePath = 'report-table.md';
             fs.writeFileSync(filePath, markdownTable, 'utf8');
+            const pullRequest = github.context.payload.pull_request;
+            const link = (pullRequest && pullRequest.html_url) || github.context.ref;
+            const headSha = (pullRequest && pullRequest.head.sha) || github.context.sha;
+            core.info(`Posting status 'completed' with conclusion 'success' to ${link} (sha: ${headSha})`);
             const checkName = "coverage";
-            const client = github.getOctokit(runOptions.repo_token);
+            const client = github.getOctokit(runOptions.repoToken);
             await client.rest.checks.create({
                 name: checkName,
                 head_sha: github.context.sha,
@@ -31869,7 +31873,7 @@ async function run() {
     try {
         const runOptions = {
             reportPath: core.getInput("reportPath", { required: false }),
-            repo_token: core.getInput("repo_token", { required: true }),
+            repoToken: core.getInput("repoToken", { required: true }),
         };
         const theRunner = new runner.TestsRunner();
         await theRunner.generateSummaryTable(runOptions, [{ fileName: "example.java", packageName: "com.example", coveredLine: 223, totalLine: 251, coverage: 88 }]);

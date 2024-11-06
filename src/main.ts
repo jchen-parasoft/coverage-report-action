@@ -5,7 +5,7 @@ export async function run() {
     try {
         const runOptions: runner.RunOptions = {
             reportPath: core.getInput("reportPath", { required: false }),
-            repo_token: core.getInput("repo_token", { required: true }),
+            repoToken: core.getInput("repoToken", { required: true }),
         };
 
         const theRunner = new runner.TestsRunner();
