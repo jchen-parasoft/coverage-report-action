@@ -1,0 +1,9 @@
+name: 'Deploy coverage report results'
+description: 'A GitHub Action for deploying the reports and review results on GitHub.'
+author: 'Parasoft'
+branding:
+  icon: 'aperture'
+  color: 'blue'
+runs:
+  using: node20
+  main: 'dist/index.js'

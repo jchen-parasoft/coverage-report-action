@@ -1,5 +1,4 @@
-/project-with-default-package.iml
-/.idea/
-/target/
-/build/
-/node_modules
+.idea/
+node_modules/
+lib/
+eslint/
