@@ -28,8 +28,8 @@ class TestsRunner {
             core.info(`Posting status 'completed' with conclusion 'success' to ${link} (sha: ${headSha})`);
             core.info(runOptions.repoToken);
             const checkName = "coverage";
-            const client = github.getOctokit(runOptions.repoToken);
-            await client.rest.checks.create({
+            const createCheckRequest = {
+                ...github.context.repo,
                 name: checkName,
                 head_sha: github.context.sha,
                 status: "completed",
@@ -38,8 +38,9 @@ class TestsRunner {
                     title: checkName,
                     summary: markdownTable,
                 },
-                ...github.context.repo,
-            });
+            };
+            const client = github.getOctokit(runOptions.repoToken);
+            await client.rest.checks.create(createCheckRequest);
         }
         catch (error) {
             console.error('Error fetching report data:', error);

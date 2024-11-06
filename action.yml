@@ -4,6 +4,10 @@ author: 'Parasoft'
 branding:
   icon: 'aperture'
   color: 'blue'
+inputs:
+  repoToken:
+    description: 'github token'
+    required: true
 runs:
   using: node20
   main: 'dist/index.js'

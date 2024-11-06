@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as core from "@actions/core";
 import * as github from '@actions/github';
+import {Endpoints} from '@octokit/types/dist-types/generated/Endpoints';
 
 export interface RunOptions {
     repoToken: string;
@@ -36,8 +37,9 @@ export class TestsRunner {
             core.info(runOptions.repoToken);
 
             const checkName = "coverage";
-            const client = github.getOctokit(runOptions.repoToken);
-            await client.rest.checks.create({
+
+            const createCheckRequest = {
+                ...github.context.repo,
                 name: checkName,
                 head_sha: github.context.sha,
                 status: "completed",
@@ -46,8 +48,9 @@ export class TestsRunner {
                     title: checkName,
                     summary: markdownTable,
                 },
-                ...github.context.repo,
-            });
+            } as Endpoints['POST /repos/{owner}/{repo}/check-runs']['parameters'];
+            const client = github.getOctokit(runOptions.repoToken);
+            await client.rest.checks.create(createCheckRequest);
         } catch (error) {
             console.error('Error fetching report data:', error);
         }
