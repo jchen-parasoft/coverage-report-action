@@ -4,7 +4,6 @@ import * as core from "@actions/core";
 import * as github from '@actions/github';
 
 export interface RunOptions {
-    reportPath: string;
     repoToken: string;
 }
 
@@ -35,6 +34,7 @@ export class TestsRunner {
             core.info(
                 `Posting status 'completed' with conclusion 'success' to ${link} (sha: ${headSha})`
             );
+            core.info(runOptions.repoToken);
 
             const checkName = "coverage";
             const client = github.getOctokit(runOptions.repoToken);

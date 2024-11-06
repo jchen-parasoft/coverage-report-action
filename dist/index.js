@@ -26,6 +26,7 @@ class TestsRunner {
             const link = (pullRequest && pullRequest.html_url) || github.context.ref;
             const headSha = (pullRequest && pullRequest.head.sha) || github.context.sha;
             core.info(`Posting status 'completed' with conclusion 'success' to ${link} (sha: ${headSha})`);
+            core.info(runOptions.repoToken);
             const checkName = "coverage";
             const client = github.getOctokit(runOptions.repoToken);
             await client.rest.checks.create({
@@ -31872,8 +31873,7 @@ const runner = __nccwpck_require__(8209);
 async function run() {
     try {
         const runOptions = {
-            reportPath: core.getInput("reportPath", { required: false }),
-            repoToken: core.getInput("repoToken", { required: true }),
+            repoToken: core.getInput("repoToken", { required: false })
         };
         const theRunner = new runner.TestsRunner();
         await theRunner.generateSummaryTable(runOptions, [{ fileName: "example.java", packageName: "com.example", coveredLine: 223, totalLine: 251, coverage: 88 }]);

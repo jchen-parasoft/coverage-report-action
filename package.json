@@ -10,7 +10,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "package": "ncc build --license licenses.txt",
     "clean": "rimraf ./dist ./lib ./eslint",
-    "all": "npm run clean && npm run compile && npm run lint && npm run package"
+    "all": "npm run clean && npm run compile && npm run package"
   },
   "repository": {
     "type": "git",
