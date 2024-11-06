@@ -4,7 +4,7 @@ import * as runner from './runner';
 export async function run() {
     try {
         const runOptions: runner.RunOptions = {
-            repoToken: core.getInput("repoToken", { required: false })
+            repoToken: core.getInput("repoToken", { required: true })
         };
 
         const theRunner = new runner.TestsRunner();

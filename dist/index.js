@@ -31873,7 +31873,7 @@ const runner = __nccwpck_require__(8209);
 async function run() {
     try {
         const runOptions = {
-            repoToken: core.getInput("repoToken", { required: false })
+            repoToken: core.getInput("repoToken", { required: true })
         };
         const theRunner = new runner.TestsRunner();
         await theRunner.generateSummaryTable(runOptions, [{ fileName: "example.java", packageName: "com.example", coveredLine: 223, totalLine: 251, coverage: 88 }]);

@@ -1,4 +1,3 @@
-import { execSync } from 'child_process';
 import * as fs from 'fs';
 import * as core from "@actions/core";
 import * as github from '@actions/github';
