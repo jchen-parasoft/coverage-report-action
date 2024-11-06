@@ -8,7 +8,7 @@ export async function run() {
         };
 
         const theRunner = new runner.TestsRunner();
-        await theRunner.generateSummaryTable(runOptions, [{fileName: "example.java",coveredLine: 223, totalLine: 251, coverage: 88}]);
+        await theRunner.generateSummaryTable(runOptions, [{fileName: "example.java",packageName:"com.example.package", coveredLine: 223, totalLine: 251, coverage: 88}]);
     } catch (error) {
         if (error instanceof Error) {
             core.error(error);

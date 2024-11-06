@@ -6,6 +6,7 @@ export interface RunOptions {
 
 interface ReportItem {
     fileName: string;
+    packageName: string;
     coveredLine: number;
     totalLine: number;
     coverage: number;
@@ -15,9 +16,9 @@ export class TestsRunner {
     async generateSummaryTable(runOptions : RunOptions, reportData: ReportItem[]) : Promise<void> {
         try {
             let markdownTable = '| File | Covered | Total | Percentage |\n';
-            markdownTable += '| -- | ---- | ----- |\n';
+            markdownTable += '| ------ | -- | -- | -- |\n';
             reportData.forEach(item => {
-                markdownTable += `| ${item.fileName} | ${item.coveredLine} | ${item.totalLine} | ${item.coverage}% |\n`;
+                markdownTable += `| <details><summary>${item.packageName}</summary>${item.fileName}</details> | ${item.coveredLine} | ${item.totalLine} | ${item.coverage}% |\n`;
             });
 
             console.log(markdownTable);
