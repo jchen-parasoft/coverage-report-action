@@ -1,9 +1,11 @@
 import { execSync } from 'child_process';
 import * as fs from 'fs';
 import * as core from "@actions/core";
+import * as github from '@actions/github';
 
 export interface RunOptions {
     reportPath: string;
+    repo_token: string;
 }
 
 interface ReportItem {
@@ -27,13 +29,21 @@ export class TestsRunner {
             const filePath = 'report-table.md';
             fs.writeFileSync(filePath, markdownTable, 'utf8');
 
-            // 执行 Git 命令将文件添加到仓库并提交
-            execSync(`git add ${filePath}`);
-            execSync(`git commit -m "Add generated report table"`);
+            const checkName = "coverage";
 
-            // 如果你想要推送到远程仓库，你需要配置远程仓库的 URL 并执行 push 命令
-            // execSync(`git remote add origin https://github.com/yourusername/yourrepo.git`); // 只需要执行一次来设置远程仓库
-            execSync(`git push origin main`); // 假设你的主分支名为 main
+            const client = github.getOctokit(runOptions.repo_token);
+
+            await client.rest.checks.create({
+                name: checkName,
+                head_sha: github.context.payload.workflow_run.head_commit.id,
+                status: "completed",
+                conclusion: "success",
+                output: {
+                    title: checkName,
+                    summary: markdownTable,
+                },
+                ...github.context.repo,
+            });
         } catch (error) {
             console.error('Error fetching report data:', error);
         }

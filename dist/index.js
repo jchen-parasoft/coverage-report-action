@@ -1,59 +1,48 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 3109:
-/***/ ((module, exports, __nccwpck_require__) => {
+/***/ 8209:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.run = void 0;
+exports.TestsRunner = void 0;
+const fs = __nccwpck_require__(7147);
 const core = __nccwpck_require__(2186);
 const github = __nccwpck_require__(5438);
-const fs = __nccwpck_require__(7147);
-async function run(githubToken, conclusion) {
-    try {
-        const pullRequest = github.context.payload.pull_request;
-        const link = (pullRequest && pullRequest.html_url) || github.context.ref;
-        const headSha = (pullRequest && pullRequest.head.sha) || github.context.sha;
-        core.info(`Posting status 'completed' with conclusion '${conclusion}' to ${link} (sha: ${headSha})`);
-        const markdownTable = generateSummaryTable([{ fileName: "example.java", packageName: "com.example.package", coveredLine: 223, totalLine: 251, coverage: 88 }]);
-    }
-    catch (error) {
-        if (error instanceof Error) {
-            core.error(error);
-            core.setFailed(error.message);
+class TestsRunner {
+    async generateSummaryTable(runOptions, reportData) {
+        try {
+            let markdownTable = '| File | Covered | Total | Percentage |\n';
+            markdownTable += '| ------ | -- | -- | -- |\n';
+            reportData.forEach(item => {
+                markdownTable += `| <details><summary>${item.packageName}</summary>${item.fileName}</details> | ${item.coveredLine} | ${item.totalLine} | ${item.coverage}% |\n`;
+            });
+            core.info(markdownTable);
+            const filePath = 'report-table.md';
+            fs.writeFileSync(filePath, markdownTable, 'utf8');
+            const checkName = "coverage";
+            const client = github.getOctokit(runOptions.repo_token);
+            await client.rest.checks.create({
+                name: checkName,
+                head_sha: github.context.payload.workflow_run.head_commit.id,
+                status: "completed",
+                conclusion: "success",
+                output: {
+                    title: checkName,
+                    summary: markdownTable,
+                },
+                ...github.context.repo,
+            });
         }
-        else if (typeof error === 'string' || error instanceof String) {
-            core.setFailed(error.toString());
-        }
-        else {
-            core.setFailed(`Unknown error: ${error}`);
+        catch (error) {
+            console.error('Error fetching report data:', error);
         }
     }
 }
-exports.run = run;
-function generateSummaryTable(reportData) {
-    try {
-        let markdownTable = '| File | Covered | Total | Percentage |\n';
-        markdownTable += '| ------ | -- | -- | -- |\n';
-        reportData.forEach(item => {
-            markdownTable += `| <details><summary>${item.packageName}</summary>${item.fileName}</details> | ${item.coveredLine} | ${item.totalLine} | ${item.coverage}% |\n`;
-        });
-        core.info(markdownTable);
-        const filePath = 'report-table.md';
-        fs.writeFileSync(filePath, markdownTable, 'utf8');
-        return markdownTable;
-    }
-    catch (error) {
-        console.error('Error fetching report data:', error);
-    }
-}
-module.exports = {
-    run,
-    generateSummaryTable
-};
-//# sourceMappingURL=main.js.map
+exports.TestsRunner = TestsRunner;
+//# sourceMappingURL=runner.js.map
 
 /***/ }),
 
@@ -31866,12 +31855,45 @@ module.exports = parseParams
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
 /******/ 	
 /************************************************************************/
-/******/ 	
-/******/ 	// startup
-/******/ 	// Load entry module and return exports
-/******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __nccwpck_require__(3109);
-/******/ 	module.exports = __webpack_exports__;
-/******/ 	
+var __webpack_exports__ = {};
+// This entry need to be wrapped in an IIFE because it need to be in strict mode.
+(() => {
+"use strict";
+var exports = __webpack_exports__;
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.run = void 0;
+const core = __nccwpck_require__(2186);
+const runner = __nccwpck_require__(8209);
+async function run() {
+    try {
+        const runOptions = {
+            reportPath: core.getInput("reportPath", { required: false }),
+            repo_token: core.getInput("repo_token", { required: true }),
+        };
+        const theRunner = new runner.TestsRunner();
+        await theRunner.generateSummaryTable(runOptions, [{ fileName: "example.java", packageName: "com.example", coveredLine: 223, totalLine: 251, coverage: 88 }]);
+    }
+    catch (error) {
+        if (error instanceof Error) {
+            core.error(error);
+            core.setFailed(error.message);
+        }
+        else if (typeof error === 'string' || error instanceof String) {
+            core.setFailed(error.toString());
+        }
+        else {
+            core.setFailed(`Unknown error: ${error}`);
+        }
+    }
+}
+exports.run = run;
+if (require.main === require.cache[eval('__filename')]) {
+    run();
+}
+//# sourceMappingURL=main.js.map
+})();
+
+module.exports = __webpack_exports__;
 /******/ })()
 ;

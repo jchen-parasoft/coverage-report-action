@@ -1,26 +1,15 @@
 import * as core from "@actions/core";
 import * as runner from './runner';
-import * as github from '@actions/github';
-import * as fs from 'fs';
 
-interface ReportItem {
-    fileName: string;
-    packageName: string;
-    coveredLine: number;
-    totalLine: number;
-    coverage: number;
-}
-
-export async function run(githubToken: string, conclusion: string) {
+export async function run() {
     try {
-        const pullRequest = github.context.payload.pull_request;
-        const link = (pullRequest && pullRequest.html_url) || github.context.ref;
-        const headSha = (pullRequest && pullRequest.head.sha) || github.context.sha;
-        core.info(
-            `Posting status 'completed' with conclusion '${conclusion}' to ${link} (sha: ${headSha})`
-        );
+        const runOptions: runner.RunOptions = {
+            reportPath: core.getInput("reportPath", { required: false }),
+            repo_token: core.getInput("repo_token", { required: true }),
+        };
 
-        const markdownTable = generateSummaryTable([{fileName: "example.java",packageName:"com.example.package", coveredLine: 223, totalLine: 251, coverage: 88}]);
+        const theRunner = new runner.TestsRunner();
+        await theRunner.generateSummaryTable(runOptions, [{fileName: "example.java", packageName: "com.example",coveredLine: 223, totalLine: 251, coverage: 88}]);
     } catch (error) {
         if (error instanceof Error) {
             core.error(error);
@@ -32,26 +21,7 @@ export async function run(githubToken: string, conclusion: string) {
         }
     }
 }
-function generateSummaryTable(reportData: ReportItem[]) {
-    try {
-        let markdownTable = '| File | Covered | Total | Percentage |\n';
-        markdownTable += '| ------ | -- | -- | -- |\n';
-        reportData.forEach(item => {
-            markdownTable += `| <details><summary>${item.packageName}</summary>${item.fileName}</details> | ${item.coveredLine} | ${item.totalLine} | ${item.coverage}% |\n`;
-        });
 
-        core.info(markdownTable);
-        const filePath = 'report-table.md';
-        fs.writeFileSync(filePath, markdownTable, 'utf8');
-
-        return markdownTable;
-    } catch (error) {
-        console.error('Error fetching report data:', error);
-    }
+if (require.main === module) {
+    run();
 }
-
-module.exports = {
-    run,
-    generateSummaryTable
-};
-
