@@ -9,12 +9,21 @@ export interface RunOptions {
 }
 
 export class TestsRunner {
-    async generateSummaryTable(runOptions : RunOptions, reportData: ProcessCoverageResult[]) : Promise<void> {
+    async generateSummaryTable(runOptions : RunOptions, reports: ProcessCoverageResult[]) : Promise<void> {
         try {
             let markdownTable = '| File | Covered | Total | Percentage |\n';
             markdownTable += '| ------ | -- | -- | -- |\n';
-            reportData.forEach(item => {
-                markdownTable += `| <details><summary>${item.folder}</summary>${item.files}</details> | ${item.line} | ${item.total} | ${item.line}/${item.total}% |\n`;
+            reports.forEach(report => {
+                // const folder = reports.length <= 1 ? "" : ` ${report.folder}`;
+                report.files.forEach(file => {
+                    const fileTotal = Math.floor(file.total);
+                    const fileLines = Math.floor(file.line);
+                    const fileBranch = Math.floor(file.branch);
+                    const className = this.escapeMarkdown(file.name);
+                    core.info(fileBranch + "");
+                    const coverage = fileLines/fileTotal * 100;
+                    markdownTable += `| <details><summary>${className}</summary>${file.filename}</details> | ${fileLines} | ${fileTotal} | ${coverage}% |\n`;
+                });
             });
 
             core.info(markdownTable);
@@ -50,5 +59,9 @@ export class TestsRunner {
         } catch (error) {
             console.error('Error fetching report data:', error);
         }
+    }
+
+    escapeMarkdown(string: string) {
+        return string.replace(/([*_`~#\\])/g, "\\$1");
     }
 }

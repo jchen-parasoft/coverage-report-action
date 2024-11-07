@@ -13,7 +13,6 @@ export async function run() {
         };
 
         const reports = await cobertura.processCoverage(core.getInput("path", { required: true }), skipCovered);
-
         const theRunner = new runner.TestsRunner();
         await theRunner.generateSummaryTable(runOptions, reports);
     } catch (error) {

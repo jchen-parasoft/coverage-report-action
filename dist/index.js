@@ -209,12 +209,21 @@ const fs = __nccwpck_require__(7147);
 const core = __nccwpck_require__(2186);
 const github = __nccwpck_require__(5438);
 class TestsRunner {
-    async generateSummaryTable(runOptions, reportData) {
+    async generateSummaryTable(runOptions, reports) {
         try {
             let markdownTable = '| File | Covered | Total | Percentage |\n';
             markdownTable += '| ------ | -- | -- | -- |\n';
-            reportData.forEach(item => {
-                markdownTable += `| <details><summary>${item.folder}</summary>${item.files}</details> | ${item.line} | ${item.total} | ${item.line}/${item.total}% |\n`;
+            reports.forEach(report => {
+                // const folder = reports.length <= 1 ? "" : ` ${report.folder}`;
+                report.files.forEach(file => {
+                    const fileTotal = Math.floor(file.total);
+                    const fileLines = Math.floor(file.line);
+                    const fileBranch = Math.floor(file.branch);
+                    const className = this.escapeMarkdown(file.name);
+                    core.info(fileBranch + "");
+                    const coverage = fileLines / fileTotal * 100;
+                    markdownTable += `| <details><summary>${className}</summary>${file.filename}</details> | ${fileLines} | ${fileTotal} | ${coverage}% |\n`;
+                });
             });
             core.info(markdownTable);
             const filePath = 'report-table.md';
@@ -243,6 +252,9 @@ class TestsRunner {
         catch (error) {
             console.error('Error fetching report data:', error);
         }
+    }
+    escapeMarkdown(string) {
+        return string.replace(/([*_`~#\\])/g, "\\$1");
     }
 }
 exports.TestsRunner = TestsRunner;
