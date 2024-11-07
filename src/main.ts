@@ -1,5 +1,10 @@
 import * as core from "@actions/core";
 import * as runner from './runner';
+import * as cobertura from './cobertura';
+
+const skipCovered = JSON.parse(
+    core.getInput("skip_covered", { required: true }),
+);
 
 export async function run() {
     try {
@@ -7,8 +12,10 @@ export async function run() {
             repoToken: core.getInput("repo_token", { required: true })
         };
 
+        const reports = await cobertura.processCoverage(core.getInput("path", { required: true }), { skipCovered });
+
         const theRunner = new runner.TestsRunner();
-        await theRunner.generateSummaryTable(runOptions, [{fileName: "example.java", packageName: "com.example",coveredLine: 223, totalLine: 251, coverage: 88}]);
+        await theRunner.generateSummaryTable(runOptions, reports);
     } catch (error) {
         if (error instanceof Error) {
             core.error(error);

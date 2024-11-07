@@ -2,26 +2,19 @@ import * as fs from 'fs';
 import * as core from "@actions/core";
 import * as github from '@actions/github';
 import {Endpoints} from '@octokit/types/dist-types/generated/Endpoints';
+import {ProcessCoverageResult} from "./cobertura";
 
 export interface RunOptions {
     repoToken: string;
 }
 
-interface ReportItem {
-    fileName: string;
-    packageName: string;
-    coveredLine: number;
-    totalLine: number;
-    coverage: number;
-}
-
 export class TestsRunner {
-    async generateSummaryTable(runOptions : RunOptions, reportData: ReportItem[]) : Promise<void> {
+    async generateSummaryTable(runOptions : RunOptions, reportData: ProcessCoverageResult[]) : Promise<void> {
         try {
             let markdownTable = '| File | Covered | Total | Percentage |\n';
             markdownTable += '| ------ | -- | -- | -- |\n';
             reportData.forEach(item => {
-                markdownTable += `| <details><summary>${item.packageName}</summary>${item.fileName}</details> | ${item.coveredLine} | ${item.totalLine} | ${item.coverage}% |\n`;
+                markdownTable += `| <details><summary>${item.folder}</summary>${item.files}</details> | ${item.line} | ${item.total} | ${item.line}/${item.total}% |\n`;
             });
 
             core.info(markdownTable);

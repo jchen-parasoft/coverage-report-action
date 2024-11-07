@@ -9,6 +9,9 @@ inputs:
     description: 'The GITHUB_TOKEN for this repo'
     required: true
     default: ${{ github.token }}
+  path:
+    description: 'report path'
+    required: true
 runs:
   using: node20
   main: 'dist/index.js'
