@@ -21,7 +21,10 @@ export class TestsRunner {
                     const fileBranch = Math.floor(file.branch);
                     const className = this.escapeMarkdown(file.name);
                     core.info(fileBranch + "");
-                    const coverage = fileLines/fileTotal * 100;
+                    let coverage = fileLines/fileTotal * 100;
+                    if (fileTotal == 0) {
+                       coverage = 0;
+                    }
                     markdownTable += `| <details><summary>${className}</summary>${file.filename}</details> | ${fileLines} | ${fileTotal} | ${coverage}% |\n`;
                 });
             });
