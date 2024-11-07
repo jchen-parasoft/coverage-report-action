@@ -15,10 +15,6 @@ interface FileCoverage extends ClassCoverage {
     missing: string | any[];
 }
 
-interface Options {
-    skipCovered?: boolean;
-}
-
 export interface ProcessCoverageResult {
     total: number;
     folder: string;
@@ -30,12 +26,12 @@ export interface ProcessCoverageResult {
 /**
  * Generate the report for the given file
  *
- * @param path: string
- * @param options: Options
  * @return {Promise<{total: number, line: number, files: FileCoverage[], branch: number}>}
+ * @param path
+ * @param skipCovered
  */
 
-async function readCoverageFromFile(path: string, options: Options): Promise<{
+async function readCoverageFromFile(path: string, skipCovered: boolean): Promise<{
     total: number;
     line: number;
     files: { total: number; filename: string; line: number; name: string; missing: string | any[]; branch: number }[];
@@ -60,7 +56,7 @@ async function readCoverageFromFile(path: string, options: Options): Promise<{
                 missing: missingLines(klass),
             };
         })
-        .filter((file: FileCoverage) => options.skipCovered === false || file.total < 100);
+        .filter((file: FileCoverage) => !skipCovered || file.total < 100);
 
     return {
         ...calculateRates(coverage),
@@ -81,18 +77,16 @@ function trimFolder(path: string, positionOfFirstDiff: number): string {
 
 /**
  *
- * @param path: string
- * @param options: Options
  * @returns {Promise<ProcessCoverageResult[]>}
+ * @param path
+ * @param skipCovered
  */
-export async function processCoverage(path: string, options: Options): Promise<ProcessCoverageResult[]> {
-    options = options || {skipCovered: false};
-
+export async function processCoverage(path: string, skipCovered: boolean): Promise<ProcessCoverageResult[]> {
     const paths = glob.hasMagic(path) ? await glob(path) : [path];
     const positionOfFirstDiff = longestCommonPrefix(paths);
     return await Promise.all(
         paths.map(async (path) => {
-            const report = await readCoverageFromFile(path, options);
+            const report = await readCoverageFromFile(path, skipCovered);
             const folder = trimFolder(path, positionOfFirstDiff);
             return {
                 ...report,
@@ -127,10 +121,10 @@ function processPackage(packageObj: any) {
 /**
  * returns coverage rates
  *
- * @param element: object
  * @returns {{total: number, line: number, branch: number}}
+ * @param element
  */
-function calculateRates(element) {
+function calculateRates(element: ClassCoverage): { total: number; line: number; branch: number; } {
     const line = parseFloat(element["line-rate"]) * 100;
     const branch = parseFloat(element["branch-rate"]) * 100;
     const total = line && branch ? (line + branch) / 2 : line;
@@ -158,14 +152,14 @@ function missingLines(klass) {
     const lines = getLines(klass).sort(
         (a, b) => parseInt(a.number) - parseInt(b.number),
     );
-    const statements = lines.map((line) => line.number);
+    const statements = lines.map((line: { number: any; }) => line.number);
     const misses = lines
-        .filter((line) => parseInt(line.hits) < 1)
-        .map((line) => line.number);
+        .filter((line: { hits: string; }) => parseInt(line.hits) < 1)
+        .map((line: { number: any; }) => line.number);
     return partitionLines(statements, misses);
 }
 
-function partitionLines(statements, lines) {
+function partitionLines(statements: any, lines: string | any[]) {
     /*
      * Detect sequences, with gaps according to 'statements',
      * in 'lines' and compress them in to a range format.
@@ -204,10 +198,10 @@ function partitionLines(statements, lines) {
 
 /**
  *
- * @param paths: [string]
  * @returns number
+ * @param paths
  */
-function longestCommonPrefix(paths) {
+function longestCommonPrefix(paths: string | any[] | null) {
     let prefix = "";
     if (paths === null || paths.length === 0) return 0;
 

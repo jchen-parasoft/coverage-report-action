@@ -12,6 +12,9 @@ inputs:
   path:
     description: 'report path'
     required: true
+  skip_covered:
+    description: 'If files with 100% should be skipped from report.'
+    required: true
 runs:
   using: node20
   main: 'dist/index.js'

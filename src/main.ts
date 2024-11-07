@@ -12,7 +12,7 @@ export async function run() {
             repoToken: core.getInput("repo_token", { required: true })
         };
 
-        const reports = await cobertura.processCoverage(core.getInput("path", { required: true }), { skipCovered });
+        const reports = await cobertura.processCoverage(core.getInput("path", { required: true }), skipCovered);
 
         const theRunner = new runner.TestsRunner();
         await theRunner.generateSummaryTable(runOptions, reports);

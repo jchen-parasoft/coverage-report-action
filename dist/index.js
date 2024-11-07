@@ -15,11 +15,11 @@ const glob = __nccwpck_require__(8252);
 /**
  * Generate the report for the given file
  *
- * @param path: string
- * @param options: Options
  * @return {Promise<{total: number, line: number, files: FileCoverage[], branch: number}>}
+ * @param path
+ * @param skipCovered
  */
-async function readCoverageFromFile(path, options) {
+async function readCoverageFromFile(path, skipCovered) {
     const xml = await fs.readFile(path, "utf-8");
     const parseString = util.promisify(xml2js.parseString);
     const { coverage } = await parseString(xml, {
@@ -38,7 +38,7 @@ async function readCoverageFromFile(path, options) {
             missing: missingLines(klass),
         };
     })
-        .filter((file) => options.skipCovered === false || file.total < 100);
+        .filter((file) => !skipCovered || file.total < 100);
     return {
         ...calculateRates(coverage),
         files
@@ -57,16 +57,15 @@ function trimFolder(path, positionOfFirstDiff) {
 }
 /**
  *
- * @param path: string
- * @param options: Options
  * @returns {Promise<ProcessCoverageResult[]>}
+ * @param path
+ * @param skipCovered
  */
-async function processCoverage(path, options) {
-    options = options || { skipCovered: false };
+async function processCoverage(path, skipCovered) {
     const paths = glob.hasMagic(path) ? await glob(path) : [path];
     const positionOfFirstDiff = longestCommonPrefix(paths);
     return await Promise.all(paths.map(async (path) => {
-        const report = await readCoverageFromFile(path, options);
+        const report = await readCoverageFromFile(path, skipCovered);
         const folder = trimFolder(path, positionOfFirstDiff);
         return {
             ...report,
@@ -102,8 +101,8 @@ function processPackage(packageObj) {
 /**
  * returns coverage rates
  *
- * @param element: object
  * @returns {{total: number, line: number, branch: number}}
+ * @param element
  */
 function calculateRates(element) {
     const line = parseFloat(element["line-rate"]) * 100;
@@ -177,8 +176,8 @@ function partitionLines(statements, lines) {
 }
 /**
  *
- * @param paths: [string]
  * @returns number
+ * @param paths
  */
 function longestCommonPrefix(paths) {
     let prefix = "";
@@ -42007,7 +42006,7 @@ async function run() {
         const runOptions = {
             repoToken: core.getInput("repo_token", { required: true })
         };
-        const reports = await cobertura.processCoverage(core.getInput("path", { required: true }), { skipCovered });
+        const reports = await cobertura.processCoverage(core.getInput("path", { required: true }), skipCovered);
         const theRunner = new runner.TestsRunner();
         await theRunner.generateSummaryTable(runOptions, reports);
     }
