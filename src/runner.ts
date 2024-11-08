@@ -18,9 +18,8 @@ export class TestsRunner {
                 report.files.forEach(file => {
                     const fileTotal = Math.floor(file.total);
                     const fileLines = Math.floor(file.line);
-                    const fileBranch = Math.floor(file.branch);
+                    // const fileBranch = Math.floor(file.branch);
                     const className = this.escapeMarkdown(file.name);
-                    core.info(fileBranch + "");
                     let coverage = fileLines/fileTotal * 100;
                     if (fileTotal == 0) {
                        coverage = 0;
@@ -30,8 +29,6 @@ export class TestsRunner {
             });
 
             core.info(markdownTable);
-            const filePath = 'report-table.md';
-            fs.writeFileSync(filePath, markdownTable, 'utf8');
 
             const pullRequest = github.context.payload.pull_request;
             const link = (pullRequest && pullRequest.html_url) || github.context.ref;
@@ -40,15 +37,16 @@ export class TestsRunner {
                 `Posting status 'completed' with conclusion 'success' to ${link} (sha: ${headSha})`
             );
 
-            const checkName = "coverage";
+            const checkName = github.context.runId + " coverage";
             const createCheckRequest = {
-                ...github.context.repo,
+                owner: github.context.repo.owner,
+                repo: github.context.repo.repo,
                 name: checkName,
-                head_sha: github.context.sha,
+                head_sha: headSha,
                 status: "completed",
                 conclusion: "success",
                 output: {
-                    title: checkName,
+                    title: "Results",
                     summary: markdownTable,
                 }
             } as Endpoints['POST /repos/{owner}/{repo}/check-runs']['parameters']

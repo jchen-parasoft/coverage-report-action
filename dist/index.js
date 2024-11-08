@@ -205,7 +205,6 @@ function longestCommonPrefix(paths) {
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.TestsRunner = void 0;
-const fs = __nccwpck_require__(7147);
 const core = __nccwpck_require__(2186);
 const github = __nccwpck_require__(5438);
 class TestsRunner {
@@ -218,9 +217,8 @@ class TestsRunner {
                 report.files.forEach(file => {
                     const fileTotal = Math.floor(file.total);
                     const fileLines = Math.floor(file.line);
-                    const fileBranch = Math.floor(file.branch);
+                    // const fileBranch = Math.floor(file.branch);
                     const className = this.escapeMarkdown(file.name);
-                    core.info(fileBranch + "");
                     let coverage = fileLines / fileTotal * 100;
                     if (fileTotal == 0) {
                         coverage = 0;
@@ -229,21 +227,20 @@ class TestsRunner {
                 });
             });
             core.info(markdownTable);
-            const filePath = 'report-table.md';
-            fs.writeFileSync(filePath, markdownTable, 'utf8');
             const pullRequest = github.context.payload.pull_request;
             const link = (pullRequest && pullRequest.html_url) || github.context.ref;
             const headSha = (pullRequest && pullRequest.head.sha) || github.context.sha;
             core.info(`Posting status 'completed' with conclusion 'success' to ${link} (sha: ${headSha})`);
-            const checkName = "coverage";
+            const checkName = github.context.runId + " coverage";
             const createCheckRequest = {
-                ...github.context.repo,
+                owner: github.context.repo.owner,
+                repo: github.context.repo.repo,
                 name: checkName,
-                head_sha: github.context.sha,
+                head_sha: headSha,
                 status: "completed",
                 conclusion: "success",
                 output: {
-                    title: checkName,
+                    title: "Results",
                     summary: markdownTable,
                 }
             };
