@@ -22,11 +22,11 @@ export class TestsRunner {
                     if (fileTotal == 0) {
                        coverage = 0;
                     }
-                    markdownTable += `<details>\n <summary>${className}</summary> \n`
-                    markdownTable += '| File | Covered | Total | Percentage |\n';
-                    markdownTable += '| ------ | -- | -- | -- |\n';
+                    markdownTable += `<details>\r\n <summary>${className}</summary> \r\n`
+                    markdownTable += '| File | Covered | Total | Percentage |\r\n';
+                    markdownTable += '| ------ | -- | -- | -- |\r\n';
                     markdownTable += `| ${file.filename} | ${fileLines} | ${fileTotal} | ${coverage}% |\n`;
-                    markdownTable += '</details>\n' + '\n' + '***'
+                    markdownTable += '</details>\r\n' + '\r\n' + '***'
                 });
             });
 
