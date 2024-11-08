@@ -1,4 +1,3 @@
-import * as fs from 'fs';
 import * as core from "@actions/core";
 import * as github from '@actions/github';
 import {Endpoints} from '@octokit/types/dist-types/generated/Endpoints';
@@ -11,8 +10,7 @@ export interface RunOptions {
 export class TestsRunner {
     async generateSummaryTable(runOptions : RunOptions, reports: ProcessCoverageResult[]) : Promise<void> {
         try {
-            let markdownTable = '| File | Covered | Total | Percentage |\n';
-            markdownTable += '| ------ | -- | -- | -- |\n';
+            let markdownTable = '*** \n';
             reports.forEach(report => {
                 // const folder = reports.length <= 1 ? "" : ` ${report.folder}`;
                 report.files.forEach(file => {
@@ -24,7 +22,11 @@ export class TestsRunner {
                     if (fileTotal == 0) {
                        coverage = 0;
                     }
-                    markdownTable += `| <details><summary>${className}</summary>${file.filename}</details> | ${fileLines} | ${fileTotal} | ${coverage}% |\n`;
+                    markdownTable += `<details>\n <summary>${className}</summary> \n`
+                    markdownTable += '| File | Covered | Total | Percentage |\n';
+                    markdownTable += '| ------ | -- | -- | -- |\n';
+                    markdownTable += `| ${file.filename} | ${fileLines} | ${fileTotal} | ${coverage}% |\n`;
+                    markdownTable += '</details>\n' + '\n' + '***'
                 });
             });
 
@@ -50,10 +52,6 @@ export class TestsRunner {
                     summary: markdownTable,
                 }
             } as Endpoints['POST /repos/{owner}/{repo}/check-runs']['parameters']
-
-            core.debug(JSON.stringify(createCheckRequest, null, 2));
-
-            core.setOutput('conclusion', "success");
 
             const client = github.getOctokit(runOptions.repoToken);
             await client.rest.checks.create(createCheckRequest);

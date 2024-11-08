@@ -210,8 +210,7 @@ const github = __nccwpck_require__(5438);
 class TestsRunner {
     async generateSummaryTable(runOptions, reports) {
         try {
-            let markdownTable = '| File | Covered | Total | Percentage |\n';
-            markdownTable += '| ------ | -- | -- | -- |\n';
+            let markdownTable = '*** \n';
             reports.forEach(report => {
                 // const folder = reports.length <= 1 ? "" : ` ${report.folder}`;
                 report.files.forEach(file => {
@@ -223,7 +222,11 @@ class TestsRunner {
                     if (fileTotal == 0) {
                         coverage = 0;
                     }
-                    markdownTable += `| <details><summary>${className}</summary>${file.filename}</details> | ${fileLines} | ${fileTotal} | ${coverage}% |\n`;
+                    markdownTable += `<details>\n <summary>${className}</summary> \n`;
+                    markdownTable += '| File | Covered | Total | Percentage |\n';
+                    markdownTable += '| ------ | -- | -- | -- |\n';
+                    markdownTable += `| ${file.filename} | ${fileLines} | ${fileTotal} | ${coverage}% |\n`;
+                    markdownTable += '</details>\n' + '\n' + '***';
                 });
             });
             core.info(markdownTable);
@@ -244,8 +247,6 @@ class TestsRunner {
                     summary: markdownTable,
                 }
             };
-            core.debug(JSON.stringify(createCheckRequest, null, 2));
-            core.setOutput('conclusion', "success");
             const client = github.getOctokit(runOptions.repoToken);
             await client.rest.checks.create(createCheckRequest);
         }
