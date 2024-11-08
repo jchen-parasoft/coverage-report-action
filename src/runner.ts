@@ -10,7 +10,14 @@ export interface RunOptions {
 export class TestsRunner {
     async generateSummaryTable(runOptions : RunOptions, reports: ProcessCoverageResult[]) : Promise<void> {
         try {
-            let markdownTable = '*** \n';
+            let markdownTable = '<table>\r\n' +
+                '  <tr>\r\n' +
+                '    <th style="width: 400px;">File</th>\r\n' +
+                '    <th style="width: 100px;">Covered</th>\r\n' +
+                '    <th style="width: 100px;">Total</th>\r\n' +
+                '    <th style="width: 100px;">Percentage</th>\r\n' +
+                '  </tr>\r\n' +
+                '</table>\r\n';
             reports.forEach(report => {
                 // const folder = reports.length <= 1 ? "" : ` ${report.folder}`;
                 report.files.forEach(file => {
@@ -22,11 +29,17 @@ export class TestsRunner {
                     if (fileTotal == 0) {
                        coverage = 0;
                     }
-                    markdownTable += `<details>\r\n <summary>${className}</summary> \r\n`
-                    markdownTable += '| File | Covered | Total | Percentage |\r\n';
-                    markdownTable += '| ------ | -- | -- | -- |\r\n';
-                    markdownTable += `| ${file.filename} | ${fileLines} | ${fileTotal} | ${coverage}% |\n`;
-                    markdownTable += '</details>\r\n' + '\r\n' + '***'
+                    markdownTable += '<details>\r\n' +
+                        '<summary>'+ className +'</summary> \r\n' +
+                        '<table>\r\n' +
+                        '  <tr>\r\n'
+                    markdownTable += '<td style="width: 400px;">' + file.filename+ '</td>\r\n';
+                    markdownTable += '<td style="width: 400px;">' + fileLines+ '</td>\r\n';
+                    markdownTable += '<td style="width: 400px;">' + fileTotal+ '</td>\r\n';
+                    markdownTable += '<td style="width: 400px;">' + coverage+ '%</td>\r\n';
+                    markdownTable += '  </tr>\r\n' +
+                        '</table>\r\n' +
+                        '</details>\r\n'
                 });
             });
 
