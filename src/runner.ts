@@ -21,7 +21,7 @@ export class TestsRunner {
                     '  </tr>\r\n'+
                     '  <tr>\r\n'+
                     '<td style="width: 400px;"> All files</td>\r\n'+
-                    '<td style="width: 400px;">' + report.total+ '%</td>\r\n'+
+                    '<td style="width: 400px;">' +  Math.floor(report.total) + '%</td>\r\n'+
                     '  </tr>\r\n'+
                     '</table>\r\n';
 
@@ -30,12 +30,8 @@ export class TestsRunner {
                     // const fileBranch = Math.floor(file.branch);
                     const className = this.escapeMarkdown(file.name);
                     markdownTable += '<details>\r\n' +
-                        '<summary>'+ className.substring(className.lastIndexOf(".")) +'</summary> \r\n' +
+                        '<summary>'+ className.substring(0, className.lastIndexOf(".")) +'</summary> \r\n' +
                         '<table>\r\n' +
-                        '  <tr>\r\n' +
-                        '    <th style="width: 400px;">File</th>\r\n' +
-                        '    <th style="width: 100px;">Coverage</th>\r\n' +
-                        '  </tr>\r\n'+
                         '  <tr>\r\n'+
                         '<td style="width: 400px;">' + className + '</td>\r\n'+
                         '<td style="width: 400px;">' + fileTotal+ '%</td>\r\n'+
