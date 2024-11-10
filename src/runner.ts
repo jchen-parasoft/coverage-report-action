@@ -10,39 +10,40 @@ export interface RunOptions {
 export class TestsRunner {
     async generateSummaryTable(runOptions : RunOptions, reports: ProcessCoverageResult[]) : Promise<void> {
         try {
+            let preFileName = '';
             let markdownTable = '';
             reports.forEach(report => {
-                // const folder = reports.length <= 1 ? "" : ` ${report.folder}`;
+                markdownTable +=
+                    '<table>\r\n' +
+                    '  <tr>\r\n' +
+                    '    <th style="width: 400px;">File</th>\r\n' +
+                    '    <th style="width: 100px;">Coverage</th>\r\n' +
+                    '  </tr>\r\n'+
+                    '  <tr>\r\n'+
+                    '<td style="width: 400px;"> All files</td>\r\n'+
+                    '<td style="width: 400px;">' + report.total+ '%</td>\r\n'+
+                    '  </tr>\r\n'+
+                    '</table>\r\n';
+
                 report.files.forEach(file => {
                     const fileTotal = Math.floor(file.total);
-                    const fileLines = Math.floor(file.line);
                     // const fileBranch = Math.floor(file.branch);
                     const className = this.escapeMarkdown(file.name);
-                    let coverage = fileLines/fileTotal * 100;
-                    if (fileTotal == 0) {
-                       coverage = 0;
-                    }
                     markdownTable += '<details>\r\n' +
-                        '<summary>'+ className +'</summary> \r\n' +
+                        '<summary>'+ className.substring(className.lastIndexOf(".")) +'</summary> \r\n' +
                         '<table>\r\n' +
                         '  <tr>\r\n' +
                         '    <th style="width: 400px;">File</th>\r\n' +
-                        '    <th style="width: 100px;">Covered</th>\r\n' +
-                        '    <th style="width: 100px;">Total</th>\r\n' +
-                        '    <th style="width: 100px;">Percentage</th>\r\n' +
+                        '    <th style="width: 100px;">Coverage</th>\r\n' +
                         '  </tr>\r\n'+
                         '  <tr>\r\n'+
-                        '<td style="width: 400px;">' + file.filename+ '</td>\r\n'+
-                        '<td style="width: 400px;">' + fileLines+ '</td>\r\n'+
-                        '<td style="width: 400px;">' + fileTotal+ '</td>\r\n'+
-                        '<td style="width: 400px;">' + coverage+ '%</td>\r\n'+
+                        '<td style="width: 400px;">' + className + '</td>\r\n'+
+                        '<td style="width: 400px;">' + fileTotal+ '%</td>\r\n'+
                         '  </tr>\r\n'+
                         '</table>\r\n'+
                         '</details>\r\n';
                 });
             });
-
-            core.info(markdownTable);
 
             const pullRequest = github.context.payload.pull_request;
             const link = (pullRequest && pullRequest.html_url) || github.context.ref;
