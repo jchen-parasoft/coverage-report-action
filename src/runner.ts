@@ -45,8 +45,8 @@ export class TestsRunner {
                     } else {
                         if (file.filename === preFileName) {
                             markdownTable += '  <tr>\r\n' +
-                                '    <th style="width: 400px;">File</th>\r\n' +
-                                '    <th style="width: 100px;">Coverage</th>\r\n' +
+                                '    <th style="width: 400px;">className</th>\r\n' +
+                                '    <th style="width: 100px;">fileTotal</th>\r\n' +
                                 '  </tr>\r\n'
                         } else {
                             preFileName = file.filename;
@@ -58,6 +58,10 @@ export class TestsRunner {
                                 '  <tr>\r\n' +
                                 '    <th style="width: 400px;">File</th>\r\n' +
                                 '    <th style="width: 100px;">Coverage</th>\r\n' +
+                                '  </tr>\r\n' +
+                                '  <tr>\r\n'+
+                                '<td style="width: 400px;">' + className + '</td>\r\n'+
+                                '<td style="width: 400px;">' + fileTotal+ '%</td>\r\n'+
                                 '  </tr>\r\n';
                         }
                     }
