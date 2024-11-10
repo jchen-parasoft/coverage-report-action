@@ -10,9 +10,7 @@ export interface RunOptions {
 export class TestsRunner {
     async generateSummaryTable(runOptions : RunOptions, reports: ProcessCoverageResult[]) : Promise<void> {
         try {
-            let markdownTable = '<table>\r\n' +
-                 +
-                '</table>\r\n';
+            let markdownTable = '';
             reports.forEach(report => {
                 // const folder = reports.length <= 1 ? "" : ` ${report.folder}`;
                 report.files.forEach(file => {

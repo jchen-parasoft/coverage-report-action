@@ -210,8 +210,7 @@ const github = __nccwpck_require__(5438);
 class TestsRunner {
     async generateSummaryTable(runOptions, reports) {
         try {
-            let markdownTable = '<table>\r\n' +
-                +'</table>\r\n';
+            let markdownTable = '';
             reports.forEach(report => {
                 // const folder = reports.length <= 1 ? "" : ` ${report.folder}`;
                 report.files.forEach(file => {
