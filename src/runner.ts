@@ -11,12 +11,7 @@ export class TestsRunner {
     async generateSummaryTable(runOptions : RunOptions, reports: ProcessCoverageResult[]) : Promise<void> {
         try {
             let markdownTable = '<table>\r\n' +
-                '  <tr>\r\n' +
-                '    <th style="width: 400px;">File</th>\r\n' +
-                '    <th style="width: 100px;">Covered</th>\r\n' +
-                '    <th style="width: 100px;">Total</th>\r\n' +
-                '    <th style="width: 100px;">Percentage</th>\r\n' +
-                '  </tr>\r\n' +
+                 +
                 '</table>\r\n';
             reports.forEach(report => {
                 // const folder = reports.length <= 1 ? "" : ` ${report.folder}`;
@@ -32,14 +27,20 @@ export class TestsRunner {
                     markdownTable += '<details>\r\n' +
                         '<summary>'+ className +'</summary> \r\n' +
                         '<table>\r\n' +
-                        '  <tr>\r\n'
-                    markdownTable += '<td style="width: 400px;">' + file.filename+ '</td>\r\n';
-                    markdownTable += '<td style="width: 400px;">' + fileLines+ '</td>\r\n';
-                    markdownTable += '<td style="width: 400px;">' + fileTotal+ '</td>\r\n';
-                    markdownTable += '<td style="width: 400px;">' + coverage+ '%</td>\r\n';
-                    markdownTable += '  </tr>\r\n' +
-                        '</table>\r\n' +
-                        '</details>\r\n'
+                        '  <tr>\r\n' +
+                        '    <th style="width: 400px;">File</th>\r\n' +
+                        '    <th style="width: 100px;">Covered</th>\r\n' +
+                        '    <th style="width: 100px;">Total</th>\r\n' +
+                        '    <th style="width: 100px;">Percentage</th>\r\n' +
+                        '  </tr>\r\n'+
+                        '  <tr>\r\n'+
+                        '<td style="width: 400px;">' + file.filename+ '</td>\r\n'+
+                        '<td style="width: 400px;">' + fileLines+ '</td>\r\n'+
+                        '<td style="width: 400px;">' + fileTotal+ '</td>\r\n'+
+                        '<td style="width: 400px;">' + coverage+ '%</td>\r\n'+
+                        '  </tr>\r\n'+
+                        '</table>\r\n'+
+                        '</details>\r\n';
                 });
             });
 
