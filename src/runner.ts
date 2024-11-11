@@ -12,7 +12,9 @@ export class TestsRunner {
         try {
             let preFileName = '';
             let markdownTable = '';
+            let totalCoverage = 0;
             reports.forEach(report => {
+                totalCoverage = Math.floor(report.total);
                 markdownTable +=
                     '<table>\r\n' +
                     '  <tr>\r\n' +
@@ -21,7 +23,7 @@ export class TestsRunner {
                     '  </tr>\r\n'+
                     '  <tr>\r\n'+
                     '<td style="width: 400px;"> All files</td>\r\n'+
-                    '<td style="width: 400px;">' +  Math.floor(report.total) + '%</td>\r\n'+
+                    '<td style="width: 400px;">' +  totalCoverage + '%</td>\r\n'+
                     '  </tr>\r\n'+
                     '</table>\r\n';
 
@@ -91,15 +93,16 @@ export class TestsRunner {
             } as Endpoints['POST /repos/{owner}/{repo}/check-runs']['parameters']
 
             const client = github.getOctokit(runOptions.repoToken);
-            await client.rest.checks.create(createCheckRequest);
+            const response =await client.rest.checks.create(createCheckRequest);
 
             await core.summary
                 .addHeading('Test Results')
                 .addTable([
                     [{data: 'File', header: true}, {data: 'Result', header: true}],
-                    ['All files', '60%']
+                    ['All files', totalCoverage + "%"]
                 ])
-                .addLink('View staging deployment!', 'https://github.com')
+                .addDetails("<span>", "For more details, see")
+                .addLink('this check', response.url)
                 .write()
         } catch (error) {
             console.error('Error fetching report data:', error);
