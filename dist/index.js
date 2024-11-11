@@ -209,6 +209,7 @@ const core = __nccwpck_require__(2186);
 const github = __nccwpck_require__(5438);
 class TestsRunner {
     async generateSummaryTable(runOptions, reports) {
+        var _a;
         try {
             let preFileName = '';
             let markdownTable = '';
@@ -302,6 +303,7 @@ class TestsRunner {
                 .addRaw("For more details, see ")
                 .addLink('this check', checkRunHtmlUrl)
                 .addRaw("Results for commit ")
+                .addLink(headSha.substring(0, 6), ((_a = github.context.payload.repository) === null || _a === void 0 ? void 0 : _a.html_url) + "/commit/" + headSha)
                 .write();
         }
         catch (error) {
