@@ -302,9 +302,10 @@ class TestsRunner {
             ])
                 .addRaw("For more details, see ")
                 .addLink('this check', checkRunHtmlUrl)
-                .addSeparator()
+                .addBreak()
+                .addEOL()
                 .addRaw("Results for commit ")
-                .addLink(headSha.substring(0, 6), ((_a = github.context.payload.repository) === null || _a === void 0 ? void 0 : _a.html_url) + "/commit/" + headSha)
+                .addLink(headSha.substring(0, 7), ((_a = github.context.payload.repository) === null || _a === void 0 ? void 0 : _a.html_url) + "/commit/" + headSha)
                 .write();
         }
         catch (error) {
