@@ -94,6 +94,10 @@ export class TestsRunner {
 
             const client = github.getOctokit(runOptions.repoToken);
             const response =await client.rest.checks.create(createCheckRequest);
+            let checkRunHtmlUrl = '';
+            if(response.data.html_url != null) {
+                checkRunHtmlUrl = response.data.html_url;
+            }
 
             await core.summary
                 .addHeading('Test Results')
@@ -101,8 +105,9 @@ export class TestsRunner {
                     [{data: 'File', header: true}, {data: 'Result', header: true}],
                     ['All files', totalCoverage + "%"]
                 ])
-                .addRaw("For more details, see")
-                .addLink('this check', response.data.url)
+                .addRaw("For more details, see ")
+                .addLink('this check', checkRunHtmlUrl)
+                .addRaw("Results for commit ")
                 .write()
         } catch (error) {
             console.error('Error fetching report data:', error);
