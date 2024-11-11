@@ -283,11 +283,7 @@ class TestsRunner {
                 ref: headSha
             };
             const listForRefResponse = await client.rest.checks.listForRef(listCheckRequest);
-            core.info(listForRefResponse.data.check_runs.length.toString());
-            if (listForRefResponse.data.check_runs[0].html_url != null) {
-                core.info(listForRefResponse.data.check_runs[0].html_url);
-            }
-            if (listForRefResponse.data.check_runs.length > 0) {
+            if (listForRefResponse.data.check_runs.length > 1) {
                 const updateCheckRequest = {
                     owner: github.context.repo.owner,
                     repo: github.context.repo.repo,
