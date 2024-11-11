@@ -107,6 +107,7 @@ export class TestsRunner {
                 ])
                 .addRaw("For more details, see ")
                 .addLink('this check', checkRunHtmlUrl)
+                .addSeparator()
                 .addRaw("Results for commit ")
                 .addLink(headSha.substring(0,6), github.context.payload.repository?.html_url + "/commit/" + headSha)
                 .write()
