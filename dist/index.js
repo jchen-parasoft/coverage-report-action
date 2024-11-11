@@ -289,7 +289,7 @@ class TestsRunner {
                 core.info(listForRefResponse.data.check_runs[index - 1].html_url);
             }
             if (listForRefResponse.data.check_runs.length > 1) {
-                const updateCheckRequest = {
+                const reRequestCheckRequest = {
                     owner: github.context.repo.owner,
                     repo: github.context.repo.repo,
                     name: checkName,
@@ -302,7 +302,7 @@ class TestsRunner {
                         summary: markdownTable
                     }
                 };
-                checkRunResponse = await client.rest.checks.update(updateCheckRequest);
+                checkRunResponse = await client.rest.checks.update(reRequestCheckRequest);
             }
             else {
                 const createCheckRequest = {

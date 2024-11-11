@@ -89,8 +89,13 @@ export class TestsRunner {
             const listForRefResponse = await client.rest.checks.listForRef(listCheckRequest);
 
             const index = listForRefResponse.data.check_runs.length;
+            core.info(listForRefResponse.data.check_runs.length.toString());
+            if(listForRefResponse.data.check_runs[index-1].html_url != null) {
+                core.info(<string>listForRefResponse.data.check_runs[index-1].html_url);
+            }
+
             if (listForRefResponse.data.check_runs.length > 1) {
-                const updateCheckRequest = {
+                const reRequestCheckRequest = {
                     owner: github.context.repo.owner,
                     repo: github.context.repo.repo,
                     name: checkName,
@@ -102,8 +107,8 @@ export class TestsRunner {
                         title: "Results",
                         summary: markdownTable
                     }
-                } as Endpoints['PATCH /repos/{owner}/{repo}/check-runs/{check_run_id}']['parameters']
-                checkRunResponse = await client.rest.checks.update(updateCheckRequest);
+                } as Endpoints['POST /repos/{owner}/{repo}/check-runs/{check_run_id}/rerequest']['parameters']
+                checkRunResponse = await client.rest.checks.update(reRequestCheckRequest);
             } else {
                 const createCheckRequest = {
                     owner: github.context.repo.owner,
