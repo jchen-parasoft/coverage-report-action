@@ -280,7 +280,7 @@ class TestsRunner {
             const listCheckRequest = {
                 owner: github.context.repo.owner,
                 repo: github.context.repo.repo,
-                ref: link
+                ref: headSha
             };
             const listForRefResponse = await client.rest.checks.listForRef(listCheckRequest);
             if (listForRefResponse.data.check_runs.length > 0) {

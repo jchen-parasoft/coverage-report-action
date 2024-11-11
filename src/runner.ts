@@ -84,7 +84,7 @@ export class TestsRunner {
             const listCheckRequest = {
                 owner: github.context.repo.owner,
                 repo: github.context.repo.repo,
-                ref: link
+                ref: headSha
             } as Endpoints['GET /repos/{owner}/{repo}/commits/{ref}/check-runs']['parameters']
             const listForRefResponse = await client.rest.checks.listForRef(listCheckRequest);
 
