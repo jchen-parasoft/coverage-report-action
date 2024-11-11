@@ -295,9 +295,8 @@ class TestsRunner {
                 [{ data: 'File', header: true }, { data: 'Result', header: true }],
                 ['All files', totalCoverage + "%"]
             ])
-                .addList(["For more details, see"])
-                .addQuote("For more details, see")
-                .addLink('this check', response.url)
+                .addRaw("For more details, see")
+                .addLink('this check', response.data.url)
                 .write();
         }
         catch (error) {
