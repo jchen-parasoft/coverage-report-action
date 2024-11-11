@@ -288,7 +288,7 @@ class TestsRunner {
                     owner: github.context.repo.owner,
                     repo: github.context.repo.repo,
                     name: checkName,
-                    check_run_id: listForRefResponse.data.check_runs[0].id,
+                    check_run_id: listForRefResponse.data.check_runs[1].id,
                     head_sha: headSha,
                     status: "completed",
                     conclusion: "success",
