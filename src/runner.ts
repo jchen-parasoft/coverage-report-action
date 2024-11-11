@@ -79,7 +79,7 @@ export class TestsRunner {
 
             const checkName = github.context.runId + " coverage";
             const client = github.getOctokit(runOptions.repoToken);
-            let checkRunResponse: any;
+            // let checkRunResponse: any;
 
             const listCheckRequest = {
                 owner: github.context.repo.owner,
@@ -94,22 +94,22 @@ export class TestsRunner {
                 core.info(<string>listForRefResponse.data.check_runs[index-1].html_url);
             }
 
-            if (listForRefResponse.data.check_runs.length > 1) {
-                const reRequestCheckRequest = {
-                    owner: github.context.repo.owner,
-                    repo: github.context.repo.repo,
-                    name: checkName,
-                    check_run_id: listForRefResponse.data.check_runs[index-1].id,
-                    head_sha: headSha,
-                    status: "completed",
-                    conclusion: "success",
-                    output: {
-                        title: "Results",
-                        summary: markdownTable
-                    }
-                } as Endpoints['POST /repos/{owner}/{repo}/check-runs/{check_run_id}/rerequest']['parameters']
-                checkRunResponse = await client.rest.checks.update(reRequestCheckRequest);
-            } else {
+            // if (listForRefResponse.data.check_runs.length > 1) {
+            //     const reRequestCheckRequest = {
+            //         owner: github.context.repo.owner,
+            //         repo: github.context.repo.repo,
+            //         name: checkName,
+            //         check_run_id: listForRefResponse.data.check_runs[index-1].id,
+            //         head_sha: headSha,
+            //         status: "completed",
+            //         conclusion: "success",
+            //         output: {
+            //             title: "Results",
+            //             summary: markdownTable
+            //         }
+            //     } as Endpoints['POST /repos/{owner}/{repo}/check-runs/{check_run_id}/rerequest']['parameters']
+            //     checkRunResponse = await client.rest.checks.update(reRequestCheckRequest);
+            // } else {
                 const createCheckRequest = {
                     owner: github.context.repo.owner,
                     repo: github.context.repo.repo,
@@ -122,8 +122,8 @@ export class TestsRunner {
                         summary: markdownTable
                     }
                 } as Endpoints['POST /repos/{owner}/{repo}/check-runs']['parameters']
-                checkRunResponse = await client.rest.checks.create(createCheckRequest);
-            }
+                const checkRunResponse = await client.rest.checks.create(createCheckRequest);
+            // }
 
             let checkRunHtmlUrl = '';
             if(checkRunResponse.data.html_url != null) {

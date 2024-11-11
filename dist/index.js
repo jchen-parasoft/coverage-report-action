@@ -276,7 +276,7 @@ class TestsRunner {
             core.info(`Posting status 'completed' with conclusion 'success' to ${link} (sha: ${headSha})`);
             const checkName = github.context.runId + " coverage";
             const client = github.getOctokit(runOptions.repoToken);
-            let checkRunResponse;
+            // let checkRunResponse: any;
             const listCheckRequest = {
                 owner: github.context.repo.owner,
                 repo: github.context.repo.repo,
@@ -288,37 +288,36 @@ class TestsRunner {
             if (listForRefResponse.data.check_runs[index - 1].html_url != null) {
                 core.info(listForRefResponse.data.check_runs[index - 1].html_url);
             }
-            if (listForRefResponse.data.check_runs.length > 1) {
-                const reRequestCheckRequest = {
-                    owner: github.context.repo.owner,
-                    repo: github.context.repo.repo,
-                    name: checkName,
-                    check_run_id: listForRefResponse.data.check_runs[index - 1].id,
-                    head_sha: headSha,
-                    status: "completed",
-                    conclusion: "success",
-                    output: {
-                        title: "Results",
-                        summary: markdownTable
-                    }
-                };
-                checkRunResponse = await client.rest.checks.update(reRequestCheckRequest);
-            }
-            else {
-                const createCheckRequest = {
-                    owner: github.context.repo.owner,
-                    repo: github.context.repo.repo,
-                    name: checkName,
-                    head_sha: headSha,
-                    status: "completed",
-                    conclusion: "success",
-                    output: {
-                        title: "Results",
-                        summary: markdownTable
-                    }
-                };
-                checkRunResponse = await client.rest.checks.create(createCheckRequest);
-            }
+            // if (listForRefResponse.data.check_runs.length > 1) {
+            //     const reRequestCheckRequest = {
+            //         owner: github.context.repo.owner,
+            //         repo: github.context.repo.repo,
+            //         name: checkName,
+            //         check_run_id: listForRefResponse.data.check_runs[index-1].id,
+            //         head_sha: headSha,
+            //         status: "completed",
+            //         conclusion: "success",
+            //         output: {
+            //             title: "Results",
+            //             summary: markdownTable
+            //         }
+            //     } as Endpoints['POST /repos/{owner}/{repo}/check-runs/{check_run_id}/rerequest']['parameters']
+            //     checkRunResponse = await client.rest.checks.update(reRequestCheckRequest);
+            // } else {
+            const createCheckRequest = {
+                owner: github.context.repo.owner,
+                repo: github.context.repo.repo,
+                name: checkName,
+                head_sha: headSha,
+                status: "completed",
+                conclusion: "success",
+                output: {
+                    title: "Results",
+                    summary: markdownTable
+                }
+            };
+            const checkRunResponse = await client.rest.checks.create(createCheckRequest);
+            // }
             let checkRunHtmlUrl = '';
             if (checkRunResponse.data.html_url != null) {
                 checkRunHtmlUrl = checkRunResponse.data.html_url;
