@@ -227,6 +227,7 @@ class TestsRunner {
                 report.files.forEach((file, index) => {
                     const fileTotal = Math.floor(file.total);
                     // const fileBranch = Math.floor(file.branch);
+                    core.info(file.name);
                     const className = this.escapeMarkdown(file.name);
                     if (index === 0) {
                         markdownTable += '<details>\r\n' +
@@ -281,11 +282,19 @@ class TestsRunner {
                 conclusion: "success",
                 output: {
                     title: "Results",
-                    summary: markdownTable,
+                    summary: markdownTable
                 }
             };
             const client = github.getOctokit(runOptions.repoToken);
             await client.rest.checks.create(createCheckRequest);
+            await core.summary
+                .addHeading('Test Results')
+                .addTable([
+                [{ data: 'File', header: true }, { data: 'Result', header: true }],
+                ['All files', '60%']
+            ])
+                .addLink('View staging deployment!', 'https://github.com')
+                .write();
         }
         catch (error) {
             console.error('Error fetching report data:', error);
