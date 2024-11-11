@@ -283,10 +283,6 @@ class TestsRunner {
                 ref: headSha
             };
             const listForRefResponse = await client.rest.checks.listForRef(listCheckRequest);
-            core.info(listForRefResponse.data.check_runs.length.toString());
-            if (listForRefResponse.data.check_runs[0].html_url != null) {
-                core.info(listForRefResponse.data.check_runs[0].html_url);
-            }
             const index = listForRefResponse.data.check_runs.length;
             core.info(listForRefResponse.data.check_runs.length.toString());
             if (listForRefResponse.data.check_runs[index - 1].html_url != null) {
@@ -297,7 +293,7 @@ class TestsRunner {
                     owner: github.context.repo.owner,
                     repo: github.context.repo.repo,
                     name: checkName,
-                    check_run_id: listForRefResponse.data.check_runs[0].id,
+                    check_run_id: listForRefResponse.data.check_runs[index - 1].id,
                     head_sha: headSha,
                     status: "completed",
                     conclusion: "success",
