@@ -87,6 +87,10 @@ export class TestsRunner {
                 ref: headSha
             } as Endpoints['GET /repos/{owner}/{repo}/commits/{ref}/check-runs']['parameters']
             const listForRefResponse = await client.rest.checks.listForRef(listCheckRequest);
+            core.info(listForRefResponse.data.check_runs.length.toString());
+            if(listForRefResponse.data.check_runs[0].html_url != null) {
+                core.info(listForRefResponse.data.check_runs[0].html_url);
+            }
 
             if (listForRefResponse.data.check_runs.length > 0) {
                 const updateCheckRequest = {
