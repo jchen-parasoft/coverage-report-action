@@ -230,8 +230,7 @@ class TestsRunner {
                 report.files.forEach((file, index) => {
                     const fileTotal = Math.floor(file.total);
                     // const fileBranch = Math.floor(file.branch);
-                    core.info(file.name);
-                    const className = this.escapeMarkdown(file.name);
+                    const className = file.name;
                     if (index === 0) {
                         markdownTable += '<details>\r\n' +
                             '<summary>' + className.substring(0, className.lastIndexOf(".")) + '</summary> \r\n' +
@@ -276,23 +275,48 @@ class TestsRunner {
             const headSha = (pullRequest && pullRequest.head.sha) || github.context.sha;
             core.info(`Posting status 'completed' with conclusion 'success' to ${link} (sha: ${headSha})`);
             const checkName = github.context.runId + " coverage";
-            const createCheckRequest = {
+            const client = github.getOctokit(runOptions.repoToken);
+            let checkRunResponse;
+            const listCheckRequest = {
                 owner: github.context.repo.owner,
                 repo: github.context.repo.repo,
-                name: checkName,
-                head_sha: headSha,
-                status: "completed",
-                conclusion: "success",
-                output: {
-                    title: "Results",
-                    summary: markdownTable
-                }
+                ref: link
             };
-            const client = github.getOctokit(runOptions.repoToken);
-            const response = await client.rest.checks.create(createCheckRequest);
+            const listForRefResponse = await client.rest.checks.listForRef(listCheckRequest);
+            if (listForRefResponse.data.check_runs.length > 0) {
+                const updateCheckRequest = {
+                    owner: github.context.repo.owner,
+                    repo: github.context.repo.repo,
+                    name: checkName,
+                    check_run_id: listForRefResponse.data.check_runs[0].id,
+                    head_sha: headSha,
+                    status: "completed",
+                    conclusion: "success",
+                    output: {
+                        title: "Results",
+                        summary: markdownTable
+                    }
+                };
+                checkRunResponse = await client.rest.checks.update(updateCheckRequest);
+            }
+            else {
+                const createCheckRequest = {
+                    owner: github.context.repo.owner,
+                    repo: github.context.repo.repo,
+                    name: checkName,
+                    head_sha: headSha,
+                    status: "completed",
+                    conclusion: "success",
+                    output: {
+                        title: "Results",
+                        summary: markdownTable
+                    }
+                };
+                checkRunResponse = await client.rest.checks.create(createCheckRequest);
+            }
             let checkRunHtmlUrl = '';
-            if (response.data.html_url != null) {
-                checkRunHtmlUrl = response.data.html_url;
+            if (checkRunResponse.data.html_url != null) {
+                checkRunHtmlUrl = checkRunResponse.data.html_url;
             }
             await core.summary
                 .addHeading('Test Results')
@@ -303,7 +327,7 @@ class TestsRunner {
                 .addRaw("For more details, see ")
                 .addLink('this check', checkRunHtmlUrl)
                 .addBreak()
-                .addEOL()
+                .addBreak()
                 .addRaw("Results for commit ")
                 .addLink(headSha.substring(0, 7), ((_a = github.context.payload.repository) === null || _a === void 0 ? void 0 : _a.html_url) + "/commit/" + headSha)
                 .write();
