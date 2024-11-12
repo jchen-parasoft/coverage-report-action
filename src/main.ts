@@ -1,15 +1,13 @@
 import * as core from "@actions/core";
 import * as action from './action';
-import * as report from './report';
+// import * as report from './report';
 
 export async function run() {
     try {
-        const skipCovered = JSON.parse(core.getInput("skip_covered", { required: true }));
-        const repoToken = core.getInput("repo_token", { required: true });
-        const reports = await report.processCoverage(core.getInput("path", { required: true }), skipCovered);
-        const reportTableMarkdown = action.generateReportTable(reports);
-        const createCheckRunResponse = await action.createCheckRun(repoToken, reportTableMarkdown);
-        await action.generateWorkflowSummary(createCheckRunResponse);
+        // const skipCovered = JSON.parse(core.getInput("skip_covered", { required: true }));
+        // const repoToken = core.getInput("repo_token", { required: true });
+        // const reports = await report.processCoverage(core.getInput("path", { required: true }), skipCovered);
+        await action.generateWorkflowSummary();
     } catch (error) {
         if (error instanceof Error) {
             core.error(error);

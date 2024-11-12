@@ -72,24 +72,12 @@ export async function createCheckRun(repoToken: string, reportTable: string | un
     return await client.rest.checks.create(createCheckRequest);
 }
 
-export async function generateWorkflowSummary(createCheckRunResponse) {
-    let checkRunHtmlUrl = '';
-    if(createCheckRunResponse.data.html_url != null) {
-        checkRunHtmlUrl = createCheckRunResponse.data.html_url;
-    }
-
+export async function generateWorkflowSummary() {
     return await core.summary
-        .addHeading('Test Results')
-        .addTable([
-            [{data: 'File', header: true}, {data: 'Result', header: true}],
-            ['All files', totalCoverage + "%"]
-        ])
-        .addRaw("For more details, see ")
-        .addLink('this check', checkRunHtmlUrl)
-        .addBreak()
-        .addBreak()
-        .addRaw("Results for commit ")
-        .addLink(headSha.substring(0,7), github.context.payload.repository?.html_url + "/commit/" + headSha)
+        .addHeading('Test Results', 3)
+        .addDetails("com.parasoft.package1.another", "com.parasoft.package1.another.Convertor (100/100)")
+        .addDetails("com.parasoft.package1",'<details>\r\n' + '<summary>com.parasoft.package1.subpackage</summary> \r\n' +
+            '<table>\r\n' + 'com.parasoft.package1.subpackage.example (60/100)</table>\r\n' + '</details>\r\n')
         .write();
 }
 
