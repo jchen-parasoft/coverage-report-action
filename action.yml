@@ -6,7 +6,7 @@ branding:
   color: 'blue'
 inputs:
   workspace:
-    description: Specify a path of the workspace directory.
+    description: 'Specify a path of the workspace directory'.
     required: true
   report:
     description: 'Specify the Parasoft coverage report path.'

@@ -172,9 +172,9 @@ class coverageReport {
         const coberturaPath = runOptions.report.substring(0, parasoftXmlReportPath.lastIndexOf('.xml')) + '-cobertura.xml';
         core.info(messages_1.messagesFormatter.format(messages_1.messages.converting_soatest_report_to_xunit, parasoftXmlReportPath));
         const javaPath = runOptions.javaInstallDirPath;
-        // if (!javaPath) {
-        //     return {convertedReportPath: '', exitCode: -1};
-        // }
+        if (!javaPath) {
+            return { convertedReportPath: '', exitCode: -1 };
+        }
         const exitCode = (await this.convertReportWithJava(javaPath, parasoftXmlReportPath, coberturaPath, this.workingDir)).exitCode;
         if (exitCode == 0) {
             core.info(messages_1.messagesFormatter.format(messages_1.messages.converted_xunit_report, coberturaPath));
@@ -29471,9 +29471,9 @@ const report = __nccwpck_require__(8269);
 const messages_1 = __nccwpck_require__(9112);
 async function run() {
     const reportOptions = {
-        javaInstallDirPath: core.getInput("installDir", { required: false }),
+        javaInstallDirPath: core.getInput("javaInstallDirPath", { required: true }),
         workspace: core.getInput("workspace", { required: true }),
-        report: core.getInput("report", { required: false })
+        report: core.getInput("report", { required: true })
     };
     try {
         const coverageReport = new report.coverageReport();

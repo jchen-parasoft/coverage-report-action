@@ -64,9 +64,9 @@ export class coverageReport {
         core.info(messagesFormatter.format(messages.converting_soatest_report_to_xunit, parasoftXmlReportPath));
 
         const javaPath = runOptions.javaInstallDirPath;
-        // if (!javaPath) {
-        //     return {convertedReportPath: '', exitCode: -1};
-        // }
+        if (!javaPath) {
+            return {convertedReportPath: '', exitCode: -1};
+        }
 
         const exitCode = (await this.convertReportWithJava(javaPath, parasoftXmlReportPath, coberturaPath, this.workingDir)).exitCode;
         if (exitCode == 0) {

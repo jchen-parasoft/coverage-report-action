@@ -5,9 +5,9 @@ import { messages, messagesFormatter } from './messages'
 
 export async function run() {
     const reportOptions: report.ReportOptions = {
-        javaInstallDirPath: core.getInput("installDir", { required: false }),
+        javaInstallDirPath: core.getInput("javaInstallDirPath", { required: true }),
         workspace: core.getInput("workspace", { required: true }),
-        report: core.getInput("report", { required: false })
+        report: core.getInput("report", { required: true })
     };
 
     try {
