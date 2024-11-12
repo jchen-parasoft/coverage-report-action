@@ -80,10 +80,12 @@ async function generateWorkflowSummary() {
         .addHeading('Coverage&emsp;(covered/total - percentage)', 5)
         .addSeparator()
         .addDetails("com.parasoft.package1.another", "<table><tbody><tr>&emsp;&emsp;com.parasoft.package1.another.Convertor (100/100)</tr></tbody></table>")
-        .addRaw("<details><summary>com.parasoft.package1&emsp;(80/100 - 80%)</summary><table><tr>&emsp;&emsp;class1.java&emsp;(60/100 - 60%)\n" +
-        "</tr><tr>&emsp;&emsp;class2.java&emsp;(90/100 - 90%)</></tr><tr><details><summary>com.parasoft.package1.subpackage1&emsp;(80/100 - 80%)</summary>\n" +
-        "<table><tr>&emsp;&emsp;class1.java&emsp;(60/100 - 60%)</tr><tr>&emsp;&emsp;class2.java&emsp;(90/100 - 90%)</></tr>\n" +
-        "<tr>&emsp;&emsp;class2.java&emsp;(50/100 - 50%)</tr></table></details></td></tr></table></details>")
+        .addRaw("<hr>")
+        .addRaw("<details><summary>com.parasoft.package1&emsp;(80/100 - 80%)</summary><table><tbody><tr>&emsp;&emsp;class1.java&emsp;(60/100 - 60%)\n" +
+        "</tr><tr>&emsp;&emsp;class2.java&emsp;(90/100 - 90%)</tr><tr><details><summary style=\"margin-left: 20px;\">&emsp;&emsp;com.parasoft.package1.subpackage1&emsp;(80/100 - 80%)</summary>\n" +
+        "<table><tbody><tr>&emsp;&emsp;class1.java&emsp;(60/100 - 60%)</tr><tr>&emsp;&emsp;class2.java&emsp;(90/100 - 90%)</></tr>\n" +
+        "<tr>&emsp;&emsp;class2.java&emsp;(50/100 - 50%)</tr></tbody></table></details></tr></tbody></table></details>")
+        .addRaw("<hr>")
         .addDetails("com.parasoft.package2.another", "<table><tbody><tr>&emsp;&emsp;com.parasoft.package2.another.Convertor (100/100)</tr></tbody></table>")
         .write();
 }
