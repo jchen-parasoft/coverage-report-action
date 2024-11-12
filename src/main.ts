@@ -7,8 +7,7 @@ export async function run() {
     const reportOptions: report.ReportOptions = {
         javaInstallDirPath: core.getInput("installDir", { required: false }),
         workspace: core.getInput("workspace", { required: true }),
-        report: core.getInput("report", { required: false }),
-        resource: core.getInput("resource", { required: false })
+        report: core.getInput("report", { required: false })
     };
 
     try {

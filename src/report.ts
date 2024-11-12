@@ -20,9 +20,6 @@ export interface ReportOptions {
     /* Specify the Parasoft coverage report path. */
     report: string;
 
-    /* Specify the source code path of the report. */
-    resource: string;
-
     /* Specify the JAVA installation folder path of the report. */
     javaInstallDirPath: string;
 }

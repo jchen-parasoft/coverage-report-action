@@ -29512,8 +29512,7 @@ async function run() {
     const reportOptions = {
         javaInstallDirPath: core.getInput("installDir", { required: false }),
         workspace: core.getInput("workspace", { required: true }),
-        report: core.getInput("report", { required: false }),
-        resource: core.getInput("resource", { required: false })
+        report: core.getInput("report", { required: false })
     };
     try {
         const coverageReport = new report.coverageReport();
