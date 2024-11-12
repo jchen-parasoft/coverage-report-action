@@ -85,25 +85,25 @@ async function generateWorkflowSummary() {
         "                <summary>com.parasoft.package1&emsp;(80/100 - 80%)</summary>\n" +
         "                <table>\n" +
         "                    <tr>\n" +
-        "                        <td>&emsp;class1.java&emsp;(60/100 - 60%)</td>\n" +
+        "                        &emsp;class1.java&emsp;(60/100 - 60%)\n" +
         "                    </tr>\n" +
         "                    <tr>\n" +
-        "                        <td>&emsp;class2.java&emsp;(90/100 - 90%)</td>\n" +
+        "                        &emsp;class2.java&emsp;(90/100 - 90%)\n" +
         "                    </tr>\n" +
         "                    <tr>\n" +
-        "                        <td><details><summary>com.parasoft.package1.subpackage1&emsp;(80/100 - 80%)</summary>\n" +
+        "                        <details><summary>com.parasoft.package1.subpackage1&emsp;(80/100 - 80%)</summary>\n" +
         "                            <table>\n" +
         "                                <tr>\n" +
-        "                                    <td>&emsp;class1.java&emsp;(60/100 - 60%)</td>\n" +
+        "                                    &emsp;class1.java&emsp;(60/100 - 60%)\n" +
         "                                </tr>\n" +
         "                                <tr>\n" +
-        "                                    <td>&emsp;class2.java&emsp;(90/100 - 90%)</td>\n" +
+        "                                    &emsp;class2.java&emsp;(90/100 - 90%)\n" +
         "                                </tr>\n" +
         "                                <tr>\n" +
-        "                                    <td>&emsp;class2.java&emsp;(50/100 - 50%)</td>\n" +
+        "                                    &emsp;class2.java&emsp;(50/100 - 50%)\n" +
         "                                </tr>\n" +
         "                            </table>\n" +
-        "                        </details></td>\n" +
+        "                        </details>\n" +
         "                    </tr>\n" +
         "                </table>\n" +
         "            </details>")
