@@ -77,8 +77,9 @@ async function createCheckRun(repoToken, reportTable) {
 }
 async function generateWorkflowSummary() {
     return await core.summary
-        .addHeading("Coverage&emsp;(covered/total - percentage)", 5)
-        .addTable([["<b><Total coverage&emsp;(80/100 - 80%)</b>"], ["<details>\n" +
+        .addTable([[{ data: "Coverage&emsp;(covered/total - percentage)", header: true }],
+        ["<b>Total coverage&emsp;(80/100 - 80%)</b>"],
+        ["<details>\n" +
                 "                <summary>com.parasoft.package1&emsp;(80/100 - 80%)</summary>\n" +
                 "                <table>\n" +
                 "                    <tr>\n" +
