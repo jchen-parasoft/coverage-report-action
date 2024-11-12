@@ -75,10 +75,15 @@ export async function createCheckRun(repoToken: string, reportTable: string | un
 export async function generateWorkflowSummary() {
     return await core.summary
         .addHeading('Test Results', 5)
-        .addDetails("com.parasoft.package1.another", "<span style='margin-left: 20px'>com.parasoft.package1.another.Convertor (100/100)</span>")
-        .addDetails("com.parasoft.package1",'<table><tr><details><summary style="margin-left: 20px">com.parasoft.package1.subpackage</summary>' +
-            '<table><tr><span style="margin-left: 40px">com.parasoft.package1.subpackage.example (60/100)</span></tr></table></details></tr></table>')
-        .addDetails("com.parasoft.package2.another", "<span style='margin-left: 20px'>com.parasoft.package2.another.Convertor (100/100)</span>")
+        .addSeparator()
+        .addDetails('com.parasoft.package1.another', '<span style=\'margin-left: 20px\'>com.parasoft.package1.another.Convertor (100/100)</span>')
+        .addSeparator()
+        .addRaw("<details><summary>com.parasoft.package1&emsp;(80/100 - 80%)</summary><table><tr><td>&emsp;class1.java&emsp;(60/100 - 60%)</td>\n" +
+            "</tr><tr><td>&emsp;class2.java&emsp;(90/100 - 90%)</td></tr><tr><td><details><summary>com.parasoft.package1.subpackage1&emsp;(80/100 - 80%)</summary>\n" +
+            "<table><tr><td>&emsp;class1.java&emsp;(60/100 - 60%)</td></tr><tr><td>&emsp;class2.java&emsp;(90/100 - 90%)</td></tr>\n" +
+            "<tr><td>&emsp;class2.java&emsp;(50/100 - 50%)</td></tr></table></details></td></tr></table></details>")
+        .addSeparator()
+        .addDetails('com.parasoft.package2.another', '<span style=\'margin-left: 20px\'>com.parasoft.package2.another.Convertor (100/100)</span>')
         .write();
 }
 
