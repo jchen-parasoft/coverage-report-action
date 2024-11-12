@@ -74,15 +74,71 @@ export async function createCheckRun(repoToken: string, reportTable: string | un
 
 export async function generateWorkflowSummary() {
     return await core.summary
-        .addHeading('Coverage&emsp;(covered/total - percentage)', 5)
-        .addTable([["<details><summary>com.parasoft.package1.another</summary>&emsp;&emsp;com.parasoft.package1.another.Convertor (100/100)</details>"]])
-        .addEOL()
-        .addDetails("com.parasoft.package1&emsp;(80/100 - 80%)", "<table><tr><td>class1.java&emsp;(60/100 - 60%)</td>\n" +
-            "<td>class2.java&emsp;(90/100 - 90%)</td><td><details><summary style=\"margin-left: 20px;\">com.parasoft.package1.subpackage1&emsp;(80/100 - 80%)</summary>\n" +
-            "<table style=\"list-style-type: none;\"><tbody><tr><td>class1.java&emsp;(60/100 - 60%)</td><td>class2.java&emsp;(90/100 - 90%)</td>\n" +
-            "<td>class2.java&emsp;(50/100 - 50%)</td></tr></tbody></table></details></td></tr></table>")
-        .addEOL()
-        .addTable([["<details><summary>com.parasoft.package2.another</summary>&emsp;&emsp;com.parasoft.package2.another.Convertor (100/100)</details>"]])
+        .addRaw("<table>\n" +
+            "    <tr>\n" +
+            "        <th>Coverage&emsp;(covered/total - percentage)</th>\n" +
+            "    </tr>\n" +
+            "    <tr>\n" +
+            "        <td><b>Total coverage&emsp;(80/100 - 80%)</b></td>\n" +
+            "    </tr>\n" +
+            "    <tr>\n" +
+            "        <td>\n" +
+            "            <details>\n" +
+            "                <summary>com.parasoft.package1&emsp;(80/100 - 80%)</summary>\n" +
+            "                <table>\n" +
+            "                    <tr>\n" +
+            "                        <td>&emsp;class1.java&emsp;(60/100 - 60%)</td>\n" +
+            "                    </tr>\n" +
+            "                    <tr>\n" +
+            "                        <td>&emsp;class2.java&emsp;(90/100 - 90%)</td>\n" +
+            "                    </tr>\n" +
+            "                    <tr>\n" +
+            "                        <td><details><summary>com.parasoft.package1.subpackage1&emsp;(80/100 - 80%)</summary>\n" +
+            "                            <table>\n" +
+            "                                <tr>\n" +
+            "                                    <td>&emsp;class1.java&emsp;(60/100 - 60%)</td>\n" +
+            "                                </tr>\n" +
+            "                                <tr>\n" +
+            "                                    <td>&emsp;class2.java&emsp;(90/100 - 90%)</td>\n" +
+            "                                </tr>\n" +
+            "                                <tr>\n" +
+            "                                    <td>&emsp;class2.java&emsp;(50/100 - 50%)</td>\n" +
+            "                                </tr>\n" +
+            "                            </table>\n" +
+            "                        </details></td>\n" +
+            "                    </tr>\n" +
+            "                </table>\n" +
+            "            </details>\n" +
+            "        </td>\n" +
+            "    </tr>\n" +
+            "    <tr>\n" +
+            "        <td>\n" +
+            "            <details>\n" +
+            "                <summary>com.parasoft.package2&emsp;(70/100 - 70%)</summary>\n" +
+            "                <table>\n" +
+            "                    <tr>\n" +
+            "                        <td>&emsp;class1.java&emsp;(60/100 - 60%)</td>\n" +
+            "                    </tr>\n" +
+            "                    <tr>\n" +
+            "                        <td>&emsp;class2.java&emsp;(90/100 - 90%)</td>\n" +
+            "                    </tr>\n" +
+            "                    <tr>\n" +
+            "                        <td>&emsp;class2.java&emsp;(50/100 - 50%)</td>\n" +
+            "                    </tr>\n" +
+            "                </table>\n" +
+            "            </details>\n" +
+            "            </td>\n" +
+            "    </tr>\n" +
+            "</table>")
+        // .addHeading('Coverage&emsp;(covered/total - percentage)', 5)
+        // .addTable([["<details><summary>com.parasoft.package1.another</summary>&emsp;&emsp;com.parasoft.package1.another.Convertor (100/100)</details>"]])
+        // .addEOL()
+        // .addDetails("com.parasoft.package1&emsp;(80/100 - 80%)", "<table><tr><td>class1.java&emsp;(60/100 - 60%)</td>\n" +
+        //     "<td>class2.java&emsp;(90/100 - 90%)</td><td><details><summary style=\"margin-left: 20px;\">com.parasoft.package1.subpackage1&emsp;(80/100 - 80%)</summary>\n" +
+        //     "<table style=\"list-style-type: none;\"><tbody><tr><td>class1.java&emsp;(60/100 - 60%)</td><td>class2.java&emsp;(90/100 - 90%)</td>\n" +
+        //     "<td>class2.java&emsp;(50/100 - 50%)</td></tr></tbody></table></details></td></tr></table>")
+        // .addEOL()
+        // .addTable([["<details><summary>com.parasoft.package2.another</summary>&emsp;&emsp;com.parasoft.package2.another.Convertor (100/100)</details>"]])
         .write();
 }
 
