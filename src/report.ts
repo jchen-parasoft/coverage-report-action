@@ -1,219 +1,252 @@
-import * as fs from 'fs/promises';
-import * as xml2js from 'xml2js';
-import * as util from 'util';
-import * as glob from 'glob-promise';
+import * as core from "@actions/core";
+import * as cp from 'child_process';
+import * as fs from 'fs';
+import * as pt from 'path';
+import * as sax from 'sax';
+import { messages, messagesFormatter } from './messages';
 
-interface ClassCoverage {
-    filename: string;
+export interface RunDetails {
+    exitCode : number
+}
+
+export interface convertedCoberturaReport extends RunDetails {
+    convertedReportPath: string;
+}
+
+export interface ReportOptions {
+    /* Specify a path of the workspace directory. */
+    workspace: string;
+
+    /* Specify the Parasoft coverage report path. */
+    report: string;
+
+    /* Specify the source code path of the report. */
+    resource: string;
+
+    /* Specify the JAVA installation folder path of the report. */
+    javaInstallDirPath: string;
+}
+
+export type CoberturaCoverage = {
+    lineRate: number;
+    linesCovered: number;
+    linesValid: number;
+    packages: Map<string, CoberturaPackage>;
+}
+
+export type CoberturaPackage = {
     name: string;
-    total: number;
-    line: number;
-    branch: number;
+    lineRate: number;
+    classes: Map<string, CoberturaClass>;
 }
 
-interface FileCoverage extends ClassCoverage {
-    missing: string | any[];
+type CoberturaClass = {
+    classId: string; // Use "name + filename" to identify the class
+    fileName: string;
+    name: string;
+    lineRate: number;
+    lines: CoberturaLine[];
 }
 
-export interface ProcessCoverageResult {
-    total: number;
-    folder: string;
-    line: number;
-    files: FileCoverage[];
-    branch: number;
+type CoberturaLine = {
+    lineNumber: number;
+    lineHash: string;
+    hits: number;
 }
 
-/**
- * Generate the report for the given file
- *
- * @return {Promise<{total: number, line: number, files: FileCoverage[], branch: number}>}
- * @param path
- * @param skipCovered
- */
+export class coverageReport {
+    workingDir = process.env.GITHUB_WORKSPACE + "";
 
-async function readCoverageFromFile(path: string, skipCovered: boolean): Promise<{
-    total: number;
-    line: number;
-    files: { total: number; filename: string; line: number; name: string; missing: string | any[]; branch: number }[];
-    branch: number;
-}> {
-    const xml = await fs.readFile(path, "utf-8");
-    const parseString = util.promisify(xml2js.parseString);
-    const { coverage } = await parseString(xml, {
-        explicitArray: false,
-        mergeAttrs: true,
-    });
+    async convertReportToCobertura(runOptions: ReportOptions): Promise<convertedCoberturaReport> {
+        const parasoftXmlReportPath = this.findParasoftXmlReport(runOptions.report, this.workingDir);
+        if (!parasoftXmlReportPath) {
+            return Promise.reject(messagesFormatter.format(messages.coverage_report_not_found, runOptions.report));
+        }
 
-    const { packages } = coverage;
-    const classes = processPackages(packages);
-    const files = classes
-        .filter(Boolean)
-        .map((klass: ClassCoverage) => {
-            return {
-                ...calculateRates(klass),
-                filename: klass.filename,
-                name: klass.name,
-                missing: missingLines(klass),
-            };
-        })
-        .filter((file: FileCoverage) => !skipCovered || file.total < 100);
+        const coberturaPath = parasoftXmlReportPath.substring(0, parasoftXmlReportPath.lastIndexOf('.xml')) + '-cobertura.xml';
+        core.info(messagesFormatter.format(messages.converting_soatest_report_to_xunit, parasoftXmlReportPath));
 
-    return {
-        ...calculateRates(coverage),
-        files
-    };
-}
+        const javaPath = runOptions.javaInstallDirPath;
+        if (!javaPath) {
+            return {convertedReportPath: '', exitCode: -1};
+        }
 
-function trimFolder(path: string, positionOfFirstDiff: number): string {
-    const lastFolder = path.lastIndexOf("/") + 1;
-    if (positionOfFirstDiff >= lastFolder) {
-        return path.substring(lastFolder);
-    } else {
-        const startOffset = Math.min(positionOfFirstDiff - 1, lastFolder);
-        const length = path.length - startOffset - lastFolder - 2; // remove filename
-        return path.substring(startOffset, length);
+        const exitCode = (await this.convertReportWithJava(javaPath, parasoftXmlReportPath, coberturaPath, this.workingDir)).exitCode;
+        if (exitCode == 0) {
+            core.info(messagesFormatter.format(messages.converted_xunit_report, coberturaPath));
+        }
+
+        return {convertedReportPath: coberturaPath, exitCode: exitCode};
     }
-}
 
-/**
- *
- * @returns {Promise<ProcessCoverageResult[]>}
- * @param path
- * @param skipCovered
- */
-export async function processCoverage(path: string, skipCovered: boolean): Promise<ProcessCoverageResult[]> {
-    const paths = glob.hasMagic(path) ? await glob(path) : [path];
-    const positionOfFirstDiff = longestCommonPrefix(paths);
-    return await Promise.all(
-        paths.map(async (path) => {
-            const report = await readCoverageFromFile(path, skipCovered);
-            const folder = trimFolder(path, positionOfFirstDiff);
-            return {
-                ...report,
-                folder,
-            };
-        }),
-    );
-}
-
-function processPackages(packages: any): ClassCoverage[] {
-    if (packages.package instanceof Array) {
-        return packages.package.map((p) => processPackage(p)).flat();
-    } else if (packages.package) {
-        return processPackage(packages.package);
-    } else {
-        return processPackage(packages);
-    }
-}
-
-function processPackage(packageObj: any) {
-    if (packageObj.classes && packageObj.classes.class instanceof Array) {
-        return packageObj.classes.class;
-    } else if (packageObj.classes && packageObj.classes.class) {
-        return [packageObj.classes.class];
-    } else if (packageObj.class && packageObj.class instanceof Array) {
-        return packageObj.class;
-    } else {
-        return [packageObj.class];
-    }
-}
-
-/**
- * returns coverage rates
- *
- * @returns {{total: number, line: number, branch: number}}
- * @param element
- */
-function calculateRates(element: ClassCoverage): { total: number; line: number; branch: number; } {
-    const line = parseFloat(element["line-rate"]) * 100;
-    const branch = parseFloat(element["branch-rate"]) * 100;
-    const total = line && branch ? (line + branch) / 2 : line;
-    return {
-        total,
-        line,
-        branch,
-    };
-}
-
-function getLines(klass) {
-    if (klass.lines && klass.lines.line instanceof Array) {
-        return klass.lines.line;
-    } else if (klass.lines && klass.lines.line) {
-        return [klass.lines.line];
-    } else {
-        return [];
-    }
-}
-
-function missingLines(klass) {
-    // Bail if line-rate says fully covered
-    if (parseFloat(klass["line-rate"]) >= 1.0) return "";
-
-    const lines = getLines(klass).sort(
-        (a, b) => parseInt(a.number) - parseInt(b.number),
-    );
-    const statements = lines.map((line: { number: any; }) => line.number);
-    const misses = lines
-        .filter((line: { hits: string; }) => parseInt(line.hits) < 1)
-        .map((line: { number: any; }) => line.number);
-    return partitionLines(statements, misses);
-}
-
-function partitionLines(statements: any, lines: string | any[]) {
-    /*
-     * Detect sequences, with gaps according to 'statements',
-     * in 'lines' and compress them in to a range format.
-     *
-     * Example:
-     *
-     * statements = [1,2,3,4,5,10,11,12,13,14,15,16]
-     * lines =      [1,2,    5,10,11,   13,14,  ,16]
-     * Returns: [[1, 2], [5, 11], [13, 14], [16, 16]]
-     */
-    const ranges: any[] = [];
-    let start = null;
-    let linesCursor = 0;
-    let end: any;
-    for (const statement of statements) {
-        if (linesCursor >= lines.length) break;
-
-        if (statement === lines[linesCursor]) {
-            // (Consecutive) element from 'statements' matches
-            // element from 'lines' at 'linesCursor'
-            linesCursor += 1;
-            if (start === null) start = statement;
-            end = statement;
-        } else if (start !== null) {
-            // Consecutive elements are broken, an element from
-            // 'statements' is missing from 'lines'
-            ranges.push([start, end]);
-            start = null;
+    async processCoberturaResults(coberturaReport: string): Promise<CoberturaCoverage | undefined> {
+        if (coberturaReport) {
+            //get cobertura report results
+            return this.processXMLToObj(coberturaReport);
         }
     }
-    // (Eventually) close range running last iteration
-    if (start !== null) ranges.push([start, end]);
 
-    return ranges;
-}
-
-/**
- *
- * @returns number
- * @param paths
- */
-function longestCommonPrefix(paths: string | any[] | null) {
-    let prefix = "";
-    if (paths === null || paths.length === 0) return 0;
-
-    for (let i = 0; i < paths[0].length; i++) {
-        const char = paths[0][i]; // loop through all characters of the very first string.
-
-        for (let j = 1; j < paths.length; j++) {
-            // loop through all other strings in the array
-            if (paths[j][i] !== char) return prefix.length;
+    private findParasoftXmlReport(report: string, workingDir: string) : string | undefined {
+        if (pt.isAbsolute(report)) {
+            // with absolute path
+            core.info(messages.find_xml_report);
+        } else {
+            // with relative path
+            core.info(messagesFormatter.format(messages.find_xml_report_in_working_directory , workingDir));
+            report = pt.join(workingDir, report);
         }
-        prefix = prefix + char;
+
+        if (!fs.existsSync(report)) {
+            return undefined;
+        }
+
+        let reportDir: string = '';
+        let reportName: string = '';
+        const stats = fs.statSync(report);
+
+        if (stats.isFile()) {
+            reportDir = pt.dirname(report);
+            reportName = pt.basename(report, pt.extname(report));
+        }
+
+        if (stats.isDirectory()) {
+            reportDir = report;
+            reportName = 'report';
+            core.info(messagesFormatter.format(messages.try_to_find_xml_report_in_folder, report));
+        }
+
+        const reportFiles = fs.readdirSync(reportDir).filter(file => file.startsWith(reportName) && file.endsWith('.xml'));
+        if (reportFiles.length != 0) {
+            report = pt.join(reportDir, reportFiles.sort((a, b) => fs.statSync(pt.join(reportDir, b)).mtime.getTime() - fs.statSync(pt.join(reportDir, a)).mtime.getTime())[0]);
+            if (reportFiles.length == 1) {
+                core.info(messagesFormatter.format(messages.found_xml_report, report));
+            } else {
+                core.info(messagesFormatter.format(messages.found_multiple_reports_and_use_the_latest_one, report));
+            }
+            return report;
+        }
+        // No xml report found
+        return undefined;
     }
 
-    return prefix.length;
+    private async convertReportWithJava(javaPath: string, sourcePath: string, outPath: string, workingDirectory: string) : Promise<RunDetails>
+    {
+        core.debug(messages.using_java_to_convert_report);
+        // Transform with java
+        const jarPath = pt.join(__dirname, "SaxonHE12-2J/saxon-he-12.2.jar");
+        const xslPath = pt.join(__dirname, "cobertura.xsl");
+
+        const commandLine = `"${javaPath}" -jar "${jarPath}" -s:"${sourcePath}" -xsl:"${xslPath}" -o:"${outPath}" -versionmsg:off pipelineBuildWorkingDirectory="${workingDirectory}"`;
+        core.info(commandLine);
+
+        return await new Promise<RunDetails>((resolve, reject) => {
+            const cliProcess = cp.spawn(`${commandLine}`, {shell: true, windowsHide: true });
+            this.handleCliProcess(cliProcess, resolve, reject);
+        });
+    }
+
+    private handleCliProcess(cliProcess, resolve, reject) {
+        cliProcess.stdout?.on('data', (data) => { core.info(`${data}`.replace(/\s+$/g, '')); });
+        cliProcess.stderr?.on('data', (data) => { core.info(`${data}`.replace(/\s+$/g, '')); });
+        cliProcess.on('close', (code) => {
+            const result : RunDetails = {
+                exitCode : (code != null) ? code : 150 // 150 = signal received
+            };
+            resolve(result);
+        });
+        cliProcess.on("error", (err) => { reject(err); });
+    }
+
+    private processXMLToObj = (reportPath: string): CoberturaCoverage => {
+        const xml = fs.readFileSync(reportPath, 'utf8');
+        const coberturaCoverage: CoberturaCoverage = {
+            lineRate: 0,
+            linesValid: 0,
+            linesCovered: 0,
+            packages: new Map<string, CoberturaPackage>()
+        };
+        let coberturaPackage: CoberturaPackage = {
+            name: '',
+            lineRate: 0,
+            classes: new Map<string, CoberturaClass>()
+        };
+        let coberturaClass: CoberturaClass = {
+            fileName: '',
+            name: '',
+            lineRate: 0,
+            classId: '',
+            lines: []
+        }
+        const saxParser = sax.parser(true, {});
+        saxParser.onopentag = (node) => {
+            if (node.name == 'coverage') {
+                const lineRate = <string>node.attributes['line-rate'];
+                const linesCovered = <string>node.attributes['lines-covered'];
+                const linesValid = <string>node.attributes['lines-valid'];
+                coberturaCoverage.lineRate = parseFloat(lineRate);
+                coberturaCoverage.linesCovered = parseInt(linesCovered);
+                coberturaCoverage.linesValid = parseInt(linesValid);
+            }
+            if (node.name == 'package') {
+                const name = (<string> node.attributes.name).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                const lineRate = <string>node.attributes['line-rate'];
+                coberturaPackage.name = name;
+                coberturaPackage.lineRate = parseFloat(lineRate);
+            }
+            if (node.name == 'class') {
+                const fileName = <string>node.attributes.filename;
+                const name = <string>node.attributes.name;
+                const lineRate = <string>node.attributes['line-rate'];
+
+                coberturaClass.name = name;
+                coberturaClass.fileName = fileName;
+                coberturaClass.classId = `${name}-${fileName}`;
+                coberturaClass.lineRate = parseFloat(lineRate);
+            }
+            if (node.name == 'line') {
+                const lineNumber = <string>node.attributes.number;
+                const hits = <string>node.attributes.hits;
+                const lineHash = <string>node.attributes.hash;
+                const line: CoberturaLine = {
+                    lineNumber: parseInt(lineNumber),
+                    lineHash: lineHash,
+                    hits: parseInt(hits)
+                }
+                coberturaClass.lines.push(line);
+            }
+        };
+
+        saxParser.onerror = (e) => {
+            core.warning('Failed to process Cobertura report: ' + reportPath + '. Error was: ' + e.message);
+        };
+
+        saxParser.onclosetag = (nodeName) => {
+            if (nodeName == 'class') {
+                coberturaPackage.classes.set(coberturaClass.classId, coberturaClass);
+                coberturaClass = {
+                    fileName: '',
+                    name: '',
+                    lineRate: 0,
+                    classId: '',
+                    lines: []
+                };
+            }
+            if (nodeName == 'package') {
+                coberturaCoverage.packages.set(coberturaPackage.name, coberturaPackage);
+                coberturaPackage = {
+                    name: '',
+                    lineRate: 0,
+                    classes: new Map<string, CoberturaClass>()
+                };
+
+            }
+        };
+
+        saxParser.onend = () => {
+            // do nothing
+        };
+
+        saxParser.write(xml).close();
+        return coberturaCoverage;
+    }
 }

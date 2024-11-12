@@ -1,13 +1,26 @@
 import * as core from "@actions/core";
 import * as action from './action';
-// import * as report from './report';
+import * as report from "./report";
+import { messages, messagesFormatter } from './messages'
 
 export async function run() {
+    const reportOptions: report.ReportOptions = {
+        javaInstallDirPath: core.getInput("installDir", { required: false }),
+        workspace: core.getInput("workspace", { required: true }),
+        report: core.getInput("report", { required: false }),
+        resource: core.getInput("resource", { required: false })
+    };
+
     try {
-        // const skipCovered = JSON.parse(core.getInput("skip_covered", { required: true }));
-        // const repoToken = core.getInput("repo_token", { required: true });
-        // const reports = await report.processCoverage(core.getInput("path", { required: true }), skipCovered);
-        await action.generateWorkflowSummary();
+        const coverageReport = new report.coverageReport();
+        const outcome = await coverageReport.convertReportToCobertura(reportOptions)
+        if (outcome.exitCode != 0) {
+            core.setFailed(messagesFormatter.format(messages.failed_convert_report, outcome.exitCode));
+        }
+        const coverage = await coverageReport.processCoberturaResults(outcome.convertedReportPath);
+        if (coverage != null) {
+            await action.generateWorkflowSummary(coverage);
+        }
     } catch (error) {
         if (error instanceof Error) {
             core.error(error);
