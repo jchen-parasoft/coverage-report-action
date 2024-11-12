@@ -77,38 +77,12 @@ export async function generateWorkflowSummary() {
         .addHeading('Coverage&emsp;(covered/total - percentage)', 5)
         .addSeparator()
         .addDetails("com.parasoft.package1.another", "<table><tbody><tr>&emsp;&emsp;com.parasoft.package1.another.Convertor (100/100)</tr></tbody></table>")
-        .addRaw("<hr style='height: 1px'>")
-        .addRaw("<details>\n" +
-            "                <summary>com.parasoft.package1&emsp;(80/100 - 80%)</summary>\n" +
-            "                <table>\n" +
-            "                <tbody>\n" +
-            "                    <tr>\n" +
-            "                        &emsp;class1.java&emsp;(60/100 - 60%)\n" +
-            "                    </tr>\n" +
-            "                    <tr>\n" +
-            "                        &emsp;class2.java&emsp;(90/100 - 90%)\n" +
-            "                    </tr>\n" +
-            "                    <tr>\n" +
-            "                        <details><summary>com.parasoft.package1.subpackage1&emsp;(80/100 - 80%)</summary>\n" +
-            "                            <table>\n" +
-            "                            <tbody>\n" +
-            "                                <tr>\n" +
-            "                                    &emsp;class1.java&emsp;(60/100 - 60%)\n" +
-            "                                </tr>\n" +
-            "                                <tr>\n" +
-            "                                    &emsp;class2.java&emsp;(90/100 - 90%)\n" +
-            "                                </tr>\n" +
-            "                                <tr>\n" +
-            "                                    &emsp;class2.java&emsp;(50/100 - 50%)\n" +
-            "                                </tr>\n" +
-            "                            </tbody>\n" +
-            "                            </table>\n" +
-            "                        </details>\n" +
-            "                    </tr>\n" +
-            "                </tbody>\n" +
-            "                </table>\n" +
-            "            </details>")
-        .addRaw("<hr style='height: 1px'>>")
+        .addRaw("<hr>")
+        .addRaw("<details><summary>com.parasoft.package1&emsp;(80/100 - 80%)</summary><ul class='aaa' style=\"list-style-type: none;\"><li>&emsp;&emsp;class1.java&emsp;(60/100 - 60%)\n" +
+            "<li>&emsp;&emsp;class2.java&emsp;(90/100 - 90%)</li><li><details><summary style=\"margin-left: 20px;\">&emsp;&emsp;com.parasoft.package1.subpackage1&emsp;(80/100 - 80%)</summary>\n" +
+            "<ul style=\"list-style-type: none;\"><li>&emsp;&emsp;class1.java&emsp;(60/100 - 60%)</li><li>&emsp;&emsp;class2.java&emsp;(90/100 - 90%)</li>\n" +
+            "<li>&emsp;&emsp;class2.java&emsp;(50/100 - 50%)</li></details></li></ul></details>")
+        .addRaw("<hr>")
         .addDetails("com.parasoft.package2.another", "<table><tbody><tr>&emsp;&emsp;com.parasoft.package2.another.Convertor (100/100)</tr></tbody></table>")
         .write();
 }
