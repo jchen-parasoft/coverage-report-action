@@ -81,6 +81,7 @@ export async function generateWorkflowSummary() {
         .addRaw("<details>\n" +
             "                <summary>com.parasoft.package1&emsp;(80/100 - 80%)</summary>\n" +
             "                <table>\n" +
+            "                <tbody>\n" +
             "                    <tr>\n" +
             "                        &emsp;class1.java&emsp;(60/100 - 60%)\n" +
             "                    </tr>\n" +
@@ -90,6 +91,7 @@ export async function generateWorkflowSummary() {
             "                    <tr>\n" +
             "                        <details><summary>com.parasoft.package1.subpackage1&emsp;(80/100 - 80%)</summary>\n" +
             "                            <table>\n" +
+            "                            <tbody>\n" +
             "                                <tr>\n" +
             "                                    &emsp;class1.java&emsp;(60/100 - 60%)\n" +
             "                                </tr>\n" +
@@ -99,9 +101,11 @@ export async function generateWorkflowSummary() {
             "                                <tr>\n" +
             "                                    &emsp;class2.java&emsp;(50/100 - 50%)\n" +
             "                                </tr>\n" +
+            "                            </tbody>\n" +
             "                            </table>\n" +
             "                        </details>\n" +
             "                    </tr>\n" +
+            "                </tbody>\n" +
             "                </table>\n" +
             "            </details>")
         .addRaw("<hr style='height: 1px'>>")
