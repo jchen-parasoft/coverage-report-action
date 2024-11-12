@@ -6,7 +6,7 @@ function processPackages(packages: Map<string, CoberturaPackage>) {
     packages.forEach(packageCoverage => {
         markdown += "<details><summary>" + packageCoverage.name + "&emsp;(80/100 - "+ packageCoverage.lineRate + "%)</summary><table><tbody>";
         packageCoverage.classes.forEach(classCoverage => {
-            markdown += "<tr><td>&emsp;" + classCoverage.fileName +"&emsp;(60/100 - " + classCoverage.lineRate + "%)</td></tr>\n"
+            markdown += "<tr><td>&emsp;" + classCoverage.fileName +"&emsp;(" + classCoverage.lines.length + "/100 - " + classCoverage.lineRate + "%)</td></tr>\n"
         });
         markdown += "</tbody></table><details>"
     });
