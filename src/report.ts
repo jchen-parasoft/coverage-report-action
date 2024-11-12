@@ -55,18 +55,18 @@ export class coverageReport {
     workingDir = process.env.GITHUB_WORKSPACE + "";
 
     async convertReportToCobertura(runOptions: ReportOptions): Promise<convertedCoberturaReport> {
-        const parasoftXmlReportPath = this.findParasoftXmlReport(runOptions.report, this.workingDir);
+        const parasoftXmlReportPath = runOptions.report;
         if (!parasoftXmlReportPath) {
             return Promise.reject(messagesFormatter.format(messages.coverage_report_not_found, runOptions.report));
         }
 
-        const coberturaPath = parasoftXmlReportPath.substring(0, parasoftXmlReportPath.lastIndexOf('.xml')) + '-cobertura.xml';
+        const coberturaPath = runOptions.report.substring(0, parasoftXmlReportPath.lastIndexOf('.xml')) + '-cobertura.xml';
         core.info(messagesFormatter.format(messages.converting_soatest_report_to_xunit, parasoftXmlReportPath));
 
         const javaPath = runOptions.javaInstallDirPath;
-        if (!javaPath) {
-            return {convertedReportPath: '', exitCode: -1};
-        }
+        // if (!javaPath) {
+        //     return {convertedReportPath: '', exitCode: -1};
+        // }
 
         const exitCode = (await this.convertReportWithJava(javaPath, parasoftXmlReportPath, coberturaPath, this.workingDir)).exitCode;
         if (exitCode == 0) {
@@ -74,56 +74,6 @@ export class coverageReport {
         }
 
         return {convertedReportPath: coberturaPath, exitCode: exitCode};
-    }
-
-    async processCoberturaResults(coberturaReport: string): Promise<CoberturaCoverage | undefined> {
-        if (coberturaReport) {
-            //get cobertura report results
-            return this.processXMLToObj(coberturaReport);
-        }
-    }
-
-    private findParasoftXmlReport(report: string, workingDir: string) : string | undefined {
-        if (pt.isAbsolute(report)) {
-            // with absolute path
-            core.info(messages.find_xml_report);
-        } else {
-            // with relative path
-            core.info(messagesFormatter.format(messages.find_xml_report_in_working_directory , workingDir));
-            report = pt.join(workingDir, report);
-        }
-
-        if (!fs.existsSync(report)) {
-            return undefined;
-        }
-
-        let reportDir: string = '';
-        let reportName: string = '';
-        const stats = fs.statSync(report);
-
-        if (stats.isFile()) {
-            reportDir = pt.dirname(report);
-            reportName = pt.basename(report, pt.extname(report));
-        }
-
-        if (stats.isDirectory()) {
-            reportDir = report;
-            reportName = 'report';
-            core.info(messagesFormatter.format(messages.try_to_find_xml_report_in_folder, report));
-        }
-
-        const reportFiles = fs.readdirSync(reportDir).filter(file => file.startsWith(reportName) && file.endsWith('.xml'));
-        if (reportFiles.length != 0) {
-            report = pt.join(reportDir, reportFiles.sort((a, b) => fs.statSync(pt.join(reportDir, b)).mtime.getTime() - fs.statSync(pt.join(reportDir, a)).mtime.getTime())[0]);
-            if (reportFiles.length == 1) {
-                core.info(messagesFormatter.format(messages.found_xml_report, report));
-            } else {
-                core.info(messagesFormatter.format(messages.found_multiple_reports_and_use_the_latest_one, report));
-            }
-            return report;
-        }
-        // No xml report found
-        return undefined;
     }
 
     private async convertReportWithJava(javaPath: string, sourcePath: string, outPath: string, workingDirectory: string) : Promise<RunDetails>
@@ -152,6 +102,13 @@ export class coverageReport {
             resolve(result);
         });
         cliProcess.on("error", (err) => { reject(err); });
+    }
+
+    async processCoberturaResults(coberturaReport: string): Promise<CoberturaCoverage | undefined> {
+        if (coberturaReport) {
+            //get cobertura report results
+            return this.processXMLToObj(coberturaReport);
+        }
     }
 
     private processXMLToObj = (reportPath: string): CoberturaCoverage => {

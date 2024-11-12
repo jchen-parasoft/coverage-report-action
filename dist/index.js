@@ -165,66 +165,21 @@ class coverageReport {
         };
     }
     async convertReportToCobertura(runOptions) {
-        const parasoftXmlReportPath = this.findParasoftXmlReport(runOptions.report, this.workingDir);
+        const parasoftXmlReportPath = runOptions.report;
         if (!parasoftXmlReportPath) {
             return Promise.reject(messages_1.messagesFormatter.format(messages_1.messages.coverage_report_not_found, runOptions.report));
         }
-        const coberturaPath = parasoftXmlReportPath.substring(0, parasoftXmlReportPath.lastIndexOf('.xml')) + '-cobertura.xml';
+        const coberturaPath = runOptions.report.substring(0, parasoftXmlReportPath.lastIndexOf('.xml')) + '-cobertura.xml';
         core.info(messages_1.messagesFormatter.format(messages_1.messages.converting_soatest_report_to_xunit, parasoftXmlReportPath));
         const javaPath = runOptions.javaInstallDirPath;
-        if (!javaPath) {
-            return { convertedReportPath: '', exitCode: -1 };
-        }
+        // if (!javaPath) {
+        //     return {convertedReportPath: '', exitCode: -1};
+        // }
         const exitCode = (await this.convertReportWithJava(javaPath, parasoftXmlReportPath, coberturaPath, this.workingDir)).exitCode;
         if (exitCode == 0) {
             core.info(messages_1.messagesFormatter.format(messages_1.messages.converted_xunit_report, coberturaPath));
         }
         return { convertedReportPath: coberturaPath, exitCode: exitCode };
-    }
-    async processCoberturaResults(coberturaReport) {
-        if (coberturaReport) {
-            //get cobertura report results
-            return this.processXMLToObj(coberturaReport);
-        }
-    }
-    findParasoftXmlReport(report, workingDir) {
-        if (pt.isAbsolute(report)) {
-            // with absolute path
-            core.info(messages_1.messages.find_xml_report);
-        }
-        else {
-            // with relative path
-            core.info(messages_1.messagesFormatter.format(messages_1.messages.find_xml_report_in_working_directory, workingDir));
-            report = pt.join(workingDir, report);
-        }
-        if (!fs.existsSync(report)) {
-            return undefined;
-        }
-        let reportDir = '';
-        let reportName = '';
-        const stats = fs.statSync(report);
-        if (stats.isFile()) {
-            reportDir = pt.dirname(report);
-            reportName = pt.basename(report, pt.extname(report));
-        }
-        if (stats.isDirectory()) {
-            reportDir = report;
-            reportName = 'report';
-            core.info(messages_1.messagesFormatter.format(messages_1.messages.try_to_find_xml_report_in_folder, report));
-        }
-        const reportFiles = fs.readdirSync(reportDir).filter(file => file.startsWith(reportName) && file.endsWith('.xml'));
-        if (reportFiles.length != 0) {
-            report = pt.join(reportDir, reportFiles.sort((a, b) => fs.statSync(pt.join(reportDir, b)).mtime.getTime() - fs.statSync(pt.join(reportDir, a)).mtime.getTime())[0]);
-            if (reportFiles.length == 1) {
-                core.info(messages_1.messagesFormatter.format(messages_1.messages.found_xml_report, report));
-            }
-            else {
-                core.info(messages_1.messagesFormatter.format(messages_1.messages.found_multiple_reports_and_use_the_latest_one, report));
-            }
-            return report;
-        }
-        // No xml report found
-        return undefined;
     }
     async convertReportWithJava(javaPath, sourcePath, outPath, workingDirectory) {
         core.debug(messages_1.messages.using_java_to_convert_report);
@@ -249,6 +204,12 @@ class coverageReport {
             resolve(result);
         });
         cliProcess.on("error", (err) => { reject(err); });
+    }
+    async processCoberturaResults(coberturaReport) {
+        if (coberturaReport) {
+            //get cobertura report results
+            return this.processXMLToObj(coberturaReport);
+        }
     }
 }
 exports.coverageReport = coverageReport;
