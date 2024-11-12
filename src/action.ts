@@ -78,6 +78,7 @@ export async function generateWorkflowSummary() {
         .addDetails("com.parasoft.package1.another", "<span style='margin-left: 20px'>com.parasoft.package1.another.Convertor (100/100)</span>")
         .addDetails("com.parasoft.package1",'<table><tr><details><summary style="margin-left: 20px">com.parasoft.package1.subpackage</summary>' +
             '<table><tr><span style="margin-left: 40px">com.parasoft.package1.subpackage.example (60/100)</span></tr></table></details></tr></table>')
+        .addDetails("com.parasoft.package2.another", "<span style='margin-left: 20px'>com.parasoft.package2.another.Convertor (100/100)</span>")
         .write();
 }
 
