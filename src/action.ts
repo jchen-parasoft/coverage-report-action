@@ -74,10 +74,10 @@ export async function createCheckRun(repoToken: string, reportTable: string | un
 
 export async function generateWorkflowSummary() {
     return await core.summary
-        .addHeading('Test Results', 3)
-        .addDetails("com.parasoft.package1.another", "com.parasoft.package1.another.Convertor (100/100)")
-        .addDetails("com.parasoft.package1",'<details>\r\n' + '<summary>com.parasoft.package1.subpackage</summary> \r\n' +
-            '<table>\r\n' + 'com.parasoft.package1.subpackage.example (60/100)</table>\r\n' + '</details>\r\n')
+        .addHeading('Test Results', 5)
+        .addDetails("com.parasoft.package1.another", "\tcom.parasoft.package1.another.Convertor (100/100)")
+        .addDetails("com.parasoft.package1",'<table><tr><td><details><summary>com.parasoft.package1.subpackage</summary> \r\n' +
+            '<table><tr><td>com.parasoft.package1.subpackage.example (60/100)</td></tr></table></details></td></tr></table>\r\n')
         .write();
 }
 
