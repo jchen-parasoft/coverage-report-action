@@ -28,6 +28,7 @@ type CoberturaClass = {
     fileName: string;
     name: string;
     lineRate: number;
+    coveredLines: number;
     lines: CoberturaLine[];
 }
 
@@ -62,6 +63,7 @@ export class processReport {
             fileName: '',
             name: '',
             lineRate: 0,
+            coveredLines: 0,
             classId: '',
             lines: []
         }
@@ -100,6 +102,9 @@ export class processReport {
                     lineHash: lineHash,
                     hits: parseInt(hits)
                 }
+                if(parseInt(hits) > 0) {
+                    coberturaClass.coveredLines ++;
+                }
                 coberturaClass.lines.push(line);
             }
         };
@@ -115,6 +120,7 @@ export class processReport {
                     fileName: '',
                     name: '',
                     lineRate: 0,
+                    coveredLines: 0,
                     classId: '',
                     lines: []
                 };

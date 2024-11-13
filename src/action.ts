@@ -13,11 +13,14 @@ export async function generateWorkflowSummary(coverage: CoberturaCoverage) {
 function processPackages(packages: Map<string, CoberturaPackage>) {
     let markdown = '';
     packages.forEach(packageCoverage => {
-        markdown += "<tr><td><details><summary>" + packageCoverage.name + "&emsp;(80/100 - "+ Math.floor(packageCoverage.lineRate * 100) + "%)</summary><table><tbody>";
+        let totaCovertedLines: number = 0;
+        let markdownContent = '';
         packageCoverage.classes.forEach(classCoverage => {
-            markdown += "<tr><td>&emsp;" + classCoverage.name +"&emsp;(" + classCoverage.lines.length + "/100 - " + Math.floor(classCoverage.lineRate * 100) + "%)</td></tr>"
+            totaCovertedLines += classCoverage.lines.length;
+            markdownContent += "<tr><td>&emsp;" + classCoverage.name +"&emsp;(" + classCoverage.coveredLines + "/" + classCoverage.lines.length + " - " + Math.floor(classCoverage.lineRate * 100) + "%)</td></tr>"
         });
-        markdown += "</tbody></table></details></td></tr>";
+        markdown += "<tr><td><details><summary>" + packageCoverage.name + "&emsp;(" + totaCovertedLines + "/" + packageCoverage.classes.size+ " - "+ Math.floor(packageCoverage.lineRate * 100) + "%)</summary><table><tbody>";
+        markdown += markdownContent + "</tbody></table></details></td></tr>";
     });
     return markdown;
 }

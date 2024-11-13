@@ -20,11 +20,14 @@ async function generateWorkflowSummary(coverage) {
 function processPackages(packages) {
     let markdown = '';
     packages.forEach(packageCoverage => {
-        markdown += "<tr><td><details><summary>" + packageCoverage.name + "&emsp;(80/100 - " + Math.floor(packageCoverage.lineRate * 100) + "%)</summary><table><tbody>";
+        let totaCovertedLines = 0;
+        let markdownContent = '';
         packageCoverage.classes.forEach(classCoverage => {
-            markdown += "<tr><td>&emsp;" + classCoverage.name + "&emsp;(" + classCoverage.lines.length + "/100 - " + Math.floor(classCoverage.lineRate * 100) + "%)</td></tr>";
+            totaCovertedLines += classCoverage.lines.length;
+            markdownContent += "<tr><td>&emsp;" + classCoverage.name + "&emsp;(" + classCoverage.coveredLines + "/" + classCoverage.lines.length + " - " + Math.floor(classCoverage.lineRate * 100) + "%)</td></tr>";
         });
-        markdown += "</tbody></table></details></td></tr>";
+        markdown += "<tr><td><details><summary>" + packageCoverage.name + "&emsp;(" + totaCovertedLines + "/" + packageCoverage.classes.size + " - " + Math.floor(packageCoverage.lineRate * 100) + "%)</summary><table><tbody>";
+        markdown += markdownContent + "</tbody></table></details></td></tr>";
     });
     return markdown;
 }
@@ -185,6 +188,7 @@ class processReport {
                 fileName: '',
                 name: '',
                 lineRate: 0,
+                coveredLines: 0,
                 classId: '',
                 lines: []
             };
@@ -222,6 +226,9 @@ class processReport {
                         lineHash: lineHash,
                         hits: parseInt(hits)
                     };
+                    if (parseInt(hits) > 0) {
+                        coberturaClass.coveredLines++;
+                    }
                     coberturaClass.lines.push(line);
                 }
             };
@@ -235,6 +242,7 @@ class processReport {
                         fileName: '',
                         name: '',
                         lineRate: 0,
+                        coveredLines: 0,
                         classId: '',
                         lines: []
                     };
