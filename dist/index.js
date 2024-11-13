@@ -12,23 +12,118 @@ const core = __nccwpck_require__(2186);
 async function generateWorkflowSummary(coverage) {
     const markdown = processPackages(coverage.packages);
     return await core.summary
-        .addTable([[{ data: "Coverage&emsp;(covered/total - percentage)", header: true }],
-        ["<b>Total coverage&emsp;(" + coverage.linesCovered + "/" + coverage.linesValid + " - " + Math.floor(coverage.lineRate * 100) + "%)</b>"]])
-        .addRaw(markdown)
+        .addRaw("<table><tbody><tr><th>Coverage&emsp;(covered/total - percentage)</th></tr>"
+        + "<tr><td><b>Total coverage&emsp;(" + coverage.linesCovered + "/" + coverage.linesValid + " - " + Math.floor(coverage.lineRate * 100) + "%)</b></td></tr>"
+        + markdown + "</tbody></table>")
         .write();
 }
 function processPackages(packages) {
     let markdown = '';
     packages.forEach(packageCoverage => {
-        markdown += "<table><details><summary>" + packageCoverage.name + "&emsp;(80/100 - " + Math.floor(packageCoverage.lineRate * 100) + "%)</summary><table><tbody>";
+        markdown += "<tr><td><details><summary>" + packageCoverage.name + "&emsp;(80/100 - " + Math.floor(packageCoverage.lineRate * 100) + "%)</summary><table><tbody>";
         packageCoverage.classes.forEach(classCoverage => {
-            markdown += "<tr><td>&emsp;" + classCoverage.name + "&emsp;(" + classCoverage.lines.length + "/100 - " + Math.floor(classCoverage.lineRate * 100) + "%)</td></tr>\n";
+            markdown += "<tr><td>&emsp;" + classCoverage.name + "&emsp;(" + classCoverage.lines.length + "/100 - " + Math.floor(classCoverage.lineRate * 100) + "%)</td></tr>";
         });
-        markdown += "</tbody></table></details></table>";
+        markdown += "</tbody></table></details></td></tr>";
     });
     return markdown;
 }
 //# sourceMappingURL=action.js.map
+
+/***/ }),
+
+/***/ 8333:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.convertReport = void 0;
+const core = __nccwpck_require__(2186);
+const pt = __nccwpck_require__(1017);
+const cp = __nccwpck_require__(2081);
+const os = __nccwpck_require__(2037);
+const fs = __nccwpck_require__(7147);
+const messages_1 = __nccwpck_require__(9112);
+class convertReport {
+    constructor() {
+        this.workingDir = process.env.GITHUB_WORKSPACE + "";
+    }
+    async convertReportToCobertura(runOptions) {
+        const parasoftXmlReportPath = runOptions.report;
+        if (!parasoftXmlReportPath) {
+            return Promise.reject(messages_1.messagesFormatter.format(messages_1.messages.coverage_report_not_found, runOptions.report));
+        }
+        const coberturaPath = parasoftXmlReportPath.substring(0, parasoftXmlReportPath.lastIndexOf('.xml')) + '-cobertura.xml';
+        core.info(messages_1.messagesFormatter.format(messages_1.messages.converting_coverage_report_to_cobertura, parasoftXmlReportPath));
+        const javaPath = this.getJavaPath(runOptions.parasoftToolOrJavaRootPath);
+        if (!javaPath) {
+            return { convertedReportPath: '', exitCode: -1 };
+        }
+        const exitCode = (await this.convertReportWithJava(javaPath, parasoftXmlReportPath, coberturaPath, this.workingDir)).exitCode;
+        if (exitCode == 0) {
+            core.info(messages_1.messagesFormatter.format(messages_1.messages.converted_cobertura_report, coberturaPath));
+        }
+        return { convertedReportPath: coberturaPath, exitCode: exitCode };
+    }
+    async convertReportWithJava(javaPath, sourcePath, outPath, workingDirectory) {
+        core.debug(messages_1.messages.using_java_to_convert_report);
+        // Transform with java
+        const jarPath = pt.join(__dirname, "SaxonHE12-2J/saxon-he-12.2.jar");
+        const xslPath = pt.join(__dirname, "cobertura.xsl");
+        const commandLine = `"${javaPath}" -jar "${jarPath}" -s:"${sourcePath}" -xsl:"${xslPath}" -o:"${outPath}" -versionmsg:off pipelineBuildWorkingDirectory="${workingDirectory}"`;
+        core.info(commandLine);
+        return await new Promise((resolve, reject) => {
+            const cliProcess = cp.spawn(`${commandLine}`, { shell: true, windowsHide: true });
+            this.handleCliProcess(cliProcess, resolve, reject);
+        });
+    }
+    handleCliProcess(cliProcess, resolve, reject) {
+        var _a, _b;
+        (_a = cliProcess.stdout) === null || _a === void 0 ? void 0 : _a.on('data', (data) => { core.info(`${data}`.replace(/\s+$/g, '')); });
+        (_b = cliProcess.stderr) === null || _b === void 0 ? void 0 : _b.on('data', (data) => { core.info(`${data}`.replace(/\s+$/g, '')); });
+        cliProcess.on('close', (code) => {
+            const result = {
+                exitCode: (code != null) ? code : 150 // 150 = signal received
+            };
+            resolve(result);
+        });
+        cliProcess.on("error", (err) => { reject(err); });
+    }
+    getJavaPath(installDir) {
+        if (!installDir || !fs.existsSync(installDir)) {
+            core.warning(messages_1.messages.java_or_parasoft_tool_install_dir_not_found);
+            return undefined;
+        }
+        const javaFilePath = this.doGetJavaPath(installDir);
+        if (!javaFilePath) {
+            core.warning(messages_1.messages.java_not_found_in_java_or_parasoft_tool_install_dir);
+        }
+        else {
+            core.debug(messages_1.messagesFormatter.format(messages_1.messages.found_java_at, javaFilePath));
+        }
+        return javaFilePath;
+    }
+    doGetJavaPath(installDir) {
+        core.debug(messages_1.messagesFormatter.format(messages_1.messages.find_java_in_provided_install_dir, installDir));
+        const javaFileName = os.platform() == 'win32' ? "java.exe" : "java";
+        const javaPaths = [
+            "bin", // Java installation
+            "bin/dottest/Jre_x64/bin", // dotTEST installation
+            "bin/jre/bin" // C/C++test or Jtest installation
+        ];
+        for (const path of javaPaths) {
+            const javaFilePath = pt.join(installDir, path, javaFileName);
+            if (fs.existsSync(javaFilePath)) {
+                core.debug("Using Java to process report(s), Java path: " + javaFilePath);
+                return javaFilePath;
+            }
+        }
+        return undefined;
+    }
+}
+exports.convertReport = convertReport;
+//# sourceMappingURL=convert.js.map
 
 /***/ }),
 
@@ -67,16 +162,12 @@ exports.messagesFormatter = new Formatter();
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.coverageReport = void 0;
+exports.processReport = void 0;
 const core = __nccwpck_require__(2186);
-const cp = __nccwpck_require__(2081);
 const fs = __nccwpck_require__(7147);
-const pt = __nccwpck_require__(1017);
 const sax = __nccwpck_require__(2043);
-const messages_1 = __nccwpck_require__(9112);
-class coverageReport {
+class processReport {
     constructor() {
-        this.workingDir = process.env.GITHUB_WORKSPACE + "";
         this.processXMLToObj = (reportPath) => {
             const xml = fs.readFileSync(reportPath, 'utf8');
             const coberturaCoverage = {
@@ -164,47 +255,6 @@ class coverageReport {
             return coberturaCoverage;
         };
     }
-    async convertReportToCobertura(runOptions) {
-        const parasoftXmlReportPath = runOptions.report;
-        if (!parasoftXmlReportPath) {
-            return Promise.reject(messages_1.messagesFormatter.format(messages_1.messages.coverage_report_not_found, runOptions.report));
-        }
-        const coberturaPath = runOptions.report.substring(0, parasoftXmlReportPath.lastIndexOf('.xml')) + '-cobertura.xml';
-        core.info(messages_1.messagesFormatter.format(messages_1.messages.converting_soatest_report_to_xunit, parasoftXmlReportPath));
-        const javaPath = runOptions.javaInstallDirPath;
-        if (!javaPath) {
-            return { convertedReportPath: '', exitCode: -1 };
-        }
-        const exitCode = (await this.convertReportWithJava(javaPath, parasoftXmlReportPath, coberturaPath, this.workingDir)).exitCode;
-        if (exitCode == 0) {
-            core.info(messages_1.messagesFormatter.format(messages_1.messages.converted_xunit_report, coberturaPath));
-        }
-        return { convertedReportPath: coberturaPath, exitCode: exitCode };
-    }
-    async convertReportWithJava(javaPath, sourcePath, outPath, workingDirectory) {
-        core.debug(messages_1.messages.using_java_to_convert_report);
-        // Transform with java
-        const jarPath = pt.join(__dirname, "SaxonHE12-2J/saxon-he-12.2.jar");
-        const xslPath = pt.join(__dirname, "cobertura.xsl");
-        const commandLine = `"${javaPath}" -jar "${jarPath}" -s:"${sourcePath}" -xsl:"${xslPath}" -o:"${outPath}" -versionmsg:off pipelineBuildWorkingDirectory="${workingDirectory}"`;
-        core.info(commandLine);
-        return await new Promise((resolve, reject) => {
-            const cliProcess = cp.spawn(`${commandLine}`, { shell: true, windowsHide: true });
-            this.handleCliProcess(cliProcess, resolve, reject);
-        });
-    }
-    handleCliProcess(cliProcess, resolve, reject) {
-        var _a, _b;
-        (_a = cliProcess.stdout) === null || _a === void 0 ? void 0 : _a.on('data', (data) => { core.info(`${data}`.replace(/\s+$/g, '')); });
-        (_b = cliProcess.stderr) === null || _b === void 0 ? void 0 : _b.on('data', (data) => { core.info(`${data}`.replace(/\s+$/g, '')); });
-        cliProcess.on('close', (code) => {
-            const result = {
-                exitCode: (code != null) ? code : 150 // 150 = signal received
-            };
-            resolve(result);
-        });
-        cliProcess.on("error", (err) => { reject(err); });
-    }
     async processCoberturaResults(coberturaReport) {
         if (coberturaReport) {
             //get cobertura report results
@@ -212,7 +262,7 @@ class coverageReport {
         }
     }
 }
-exports.coverageReport = coverageReport;
+exports.processReport = processReport;
 //# sourceMappingURL=report.js.map
 
 /***/ }),
@@ -29468,20 +29518,22 @@ exports.run = run;
 const core = __nccwpck_require__(2186);
 const action = __nccwpck_require__(9139);
 const report = __nccwpck_require__(8269);
+const convert = __nccwpck_require__(8333);
 const messages_1 = __nccwpck_require__(9112);
 async function run() {
     const reportOptions = {
-        javaInstallDirPath: core.getInput("javaInstallDirPath", { required: true }),
-        workspace: core.getInput("workspace", { required: true }),
+        parasoftToolOrJavaRootPath: core.getInput("parasoftToolOrJavaRootPath", { required: true }),
+        workspace: core.getInput("workspaceDir", { required: true }),
         report: core.getInput("report", { required: true })
     };
     try {
-        const coverageReport = new report.coverageReport();
-        const outcome = await coverageReport.convertReportToCobertura(reportOptions);
+        const convertReport = new convert.convertReport();
+        const processReport = new report.processReport();
+        const outcome = await convertReport.convertReportToCobertura(reportOptions);
         if (outcome.exitCode != 0) {
             core.setFailed(messages_1.messagesFormatter.format(messages_1.messages.failed_convert_report, outcome.exitCode));
         }
-        const coverage = await coverageReport.processCoberturaResults(outcome.convertedReportPath);
+        const coverage = await processReport.processCoberturaResults(outcome.convertedReportPath);
         if (coverage != null) {
             await action.generateWorkflowSummary(coverage);
         }

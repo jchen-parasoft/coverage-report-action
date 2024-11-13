@@ -5,14 +5,14 @@ branding:
   icon: 'aperture'
   color: 'blue'
 inputs:
-  workspace:
+  workspaceDir:
     description: 'Specify a path of the workspace directory.'
     required: true
   report:
     description: 'Specify the Parasoft coverage report path.'
     required: true
-  javaInstallDirPath:
-    description: 'Specify the JAVA installation folder path of the report.'
+  parasoftToolOrJavaRootPath:
+    description: 'Specify Parasoft tools installation folder path or JAVA installation folder path.'
     required: true
 runs:
   using: node20

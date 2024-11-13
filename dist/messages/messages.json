@@ -1,22 +1,11 @@
 {
-    "run_started": "Running SOAtest in {0}...",
-    "run_failed": "Run failed",
-    "exit_code": "SOAtest run finished with code {0}",
-    "failed_run_non_zero": "SOAtest run failed with a non-zero exit code: {0}",
-    "work_dir_not_exist": "Working directory does not exist: {0}",
-    "soatest_workspace_dir_not_exist": "SOAtest workspace directory does not exist: {0}",
-    "found_xml_report": "Found Parasoft SOAtest XML report file: {0}",
-    "try_to_find_xml_report_in_folder": "Trying to find report.xml file under directory path: {0}...",
-    "find_xml_report": "Finding Parasoft SOAtest XML report...",
-    "find_xml_report_in_working_directory": "Finding Parasoft SOAtest XML report in working directory {0}...",
-    "found_multiple_reports_and_use_the_latest_one": "Found multiple Parasoft SOAtest XML reports and took the latest one: {0}",
     "coverage_report_not_found": "Parasoft coverage XML report not found at the specified location: {0}",
-    "converting_soatest_report_to_xunit": "Converting Parasoft SOAtest report: {0} to xUnit report...",
-    "converted_xunit_report": "XUnit report generated successfully: {0}",
+    "converting_coverage_report_to_cobertura": "Converting Parasoft coverage report: {0} to cobertura report...",
+    "converted_cobertura_report": "Cobertura report generated successfully: {0}",
     "using_java_to_convert_report": "Converting the report using Java...",
     "failed_convert_report": "Report conversion failed with a non-zero exit code: {0}",
-    "soatest_install_dir_not_found": "Unable to process the XML report using Java bundled with SOAtest because the SOAtest installation directory is missing",
-    "java_not_found_in_soatest_install_dir": "Unable to process the XML report using Java bundled with SOAtest because it is missing",
+    "java_or_parasoft_tool_install_dir_not_found": "Unable to process the XML report using Java because the Jave or Parasoft tool installation directory is missing",
+    "java_not_found_in_java_or_parasoft_tool_install_dir": "Unable to process the XML report using Java because it is missing",
     "found_java_at": "Found Java located at: {0}",
-    "find_java_in_soatest_install_dir": "Trying to find Java from SOAtest installation directory {0}..."
+    "find_java_in_provided_install_dir": "Trying to find Java from provided installation directory {0}..."
 }

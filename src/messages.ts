@@ -7,26 +7,15 @@ interface ISerializable<T> {
 }
 
 class Messages implements ISerializable<Messages> {
-    run_started!: string;
-    run_failed!: string;
-    exit_code!: string;
-    failed_run_non_zero!: string;
-    work_dir_not_exist!: string;
-    soatest_workspace_dir_not_exist!: string;
     coverage_report_not_found!: string;
-    found_xml_report!: string;
-    try_to_find_xml_report_in_folder!: string;
-    find_xml_report!: string;
-    find_xml_report_in_working_directory!: string;
-    found_multiple_reports_and_use_the_latest_one!: string;
-    converting_soatest_report_to_xunit!: string;
-    converted_xunit_report!: string;
+    converting_coverage_report_to_cobertura!: string;
+    converted_cobertura_report!: string;
     using_java_to_convert_report!: string;
     failed_convert_report!: string;
-    soatest_install_dir_not_found!: string;
-    java_not_found_in_soatest_install_dir!: string;
+    java_or_parasoft_tool_install_dir_not_found!: string;
+    java_not_found_in_java_or_parasoft_tool_install_dir!: string;
     found_java_at!: string;
-    find_java_in_soatest_install_dir!: string;
+    find_java_in_provided_install_dir!: string;
 
     deserialize(jsonPath: string) : Messages {
         const buf = fs.readFileSync(jsonPath);
