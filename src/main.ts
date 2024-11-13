@@ -1,14 +1,28 @@
 import * as core from "@actions/core";
-import * as runner from './runner';
+import * as action from './action';
+import * as report from "./report";
+import * as convert from "./convert";
+import { messages, messagesFormatter } from './messages'
 
 export async function run() {
-    try {
-        const runOptions: runner.RunOptions = {
-            repoToken: core.getInput("repo_token", { required: true })
-        };
+    const reportOptions: convert.ReportOptions = {
+        parasoftToolOrJavaRootPath: core.getInput("parasoftToolOrJavaRootPath", { required: true }),
+        workspace: core.getInput("workspaceDir", { required: true }),
+        report: core.getInput("report", { required: true })
+    };
 
-        const theRunner = new runner.TestsRunner();
-        await theRunner.generateSummaryTable(runOptions, [{fileName: "example.java", packageName: "com.example",coveredLine: 223, totalLine: 251, coverage: 88}]);
+    try {
+        const convertReport = new convert.convertReport();
+        const processReport = new report.processReport();
+
+        const outcome = await convertReport.convertReportToCobertura(reportOptions)
+        if (outcome.exitCode != 0) {
+            core.setFailed(messagesFormatter.format(messages.failed_convert_report, outcome.exitCode));
+        }
+        const coverage = await processReport.processCoberturaResults(outcome.convertedReportPath);
+        if (coverage != null) {
+            await action.generateWorkflowSummary(coverage);
+        }
     } catch (error) {
         if (error instanceof Error) {
             core.error(error);

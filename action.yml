@@ -5,10 +5,15 @@ branding:
   icon: 'aperture'
   color: 'blue'
 inputs:
-  repo_token:
-    description: 'The GITHUB_TOKEN for this repo'
+  workspaceDir:
+    description: 'Specify a path of the workspace directory.'
     required: true
-    default: ${{ github.token }}
+  report:
+    description: 'Specify the Parasoft coverage report path.'
+    required: true
+  parasoftToolOrJavaRootPath:
+    description: 'Specify Parasoft tools installation folder path or JAVA installation folder path.'
+    required: true
 runs:
   using: node20
   main: 'dist/index.js'
